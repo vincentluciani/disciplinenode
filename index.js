@@ -36,17 +36,24 @@ const connectWithDB = () => {
 }
 
 connectWithDB()
-
 https://stackoverflow.com/questions/46523321/mongoerror-connect-econnrefused-127-0-0-127017
 
+https://stackoverflow.com/questions/46523321/mongoerror-connect-econnrefused-127-0-0-127017
+discipline
 */
-mongoose.connect('mongodb://localhost:27010/discipline',{ useNewUrlParser: true, useUnifiedTopology: true, family: 4 })
+mongoose.connect('mongodb://127.0.0.1:27017/discipline',{ useNewUrlParser: true, useUnifiedTopology: true, family: 4 })
 .then(()=> console.log('Mongodb connected'))
 .catch(err => console.log(err));
 
 var httpServer = http.createServer(options,app);
 
 const port = process.env.PORT ||  5000;
+
+// Parse URL-encoded bodies (as sent by HTML forms)
+//app.use(express.urlencoded());
+
+// Parse JSON bodies (as sent by API clients)
+app.use(express.json());
 
 app.use('/habits',habitRouters);
 app.use('/progress',progressRouters);
