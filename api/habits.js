@@ -1,11 +1,11 @@
-const express = require('express');
-const router = express.Router();
+const express = require('express')
+const router = express.Router()
 const HabitsService = require('../services/HabitsService')
-
+const common = require('../utils/requestManager')
 
 router.get('/:userId',(request,response)=>{
 
-    callServiceAndAnswer(HabitsService.getUserHabits,{userId:request.params.userId},response);
+    common.callServiceAndAnswer(HabitsService.getUserHabits,{userId:request.params.userId},response,request);
 }
 )  
 
@@ -17,21 +17,10 @@ router.post('/', function(request, response){
         weekDay: request.body.weekDay
     }
 
-    callServiceAndAnswer(HabitsService.storeUserHabit,habit,response);
+    common.callServiceAndAnswer(HabitsService.storeUserHabit,habit,response,request);
 
 });
 
-const callServiceAndAnswer = (serviceFunction,inputObject,response) => {
-serviceFunction(inputObject).
-then(value => {
-    let result = {"result":value};
-    response.setHeader('Content-Type', 'application/json');
-    response.end(JSON.stringify(result));
-    console.log(value);
-    }, reason => {
-    console.log(reason );
-    /* todo give back 500 with no reason, just log the reason */
-    })
-}
+
 
 module.exports = router;
