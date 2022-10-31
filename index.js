@@ -2,6 +2,7 @@ const http = require('http');
 const express = require('express');
 const mongoose = require('mongoose');
 const session = require('express-session');
+var compression = require('compression')
 
 const mongoStoreFactory = require('connect-mongo');
 
@@ -9,8 +10,8 @@ const app = express();
 const https = require('http');
 const options = {}
 
-const habitRouters= require('./routers/habitRouters');
-const progressRouters= require('./routers/progressRouters');
+const habitRouters= require('./api/habits');
+const progressRouters= require('./api/progress');
 
 mongoose.connect('mongodb://127.0.0.1:27017/discipline',{ useNewUrlParser: true, useUnifiedTopology: true, family: 4 })
 .then(()=> console.log('Mongodb connected'))
@@ -25,6 +26,7 @@ const port = process.env.PORT ||  5000;
 
 // Parse JSON bodies (as sent by API clients)
 app.use(express.json());
+app.use(compression())
 
 app.use('/habits',habitRouters);
 app.use('/progress',progressRouters);

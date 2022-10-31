@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/vincentluciani/disciplinenode#readme",
   "dependencies": {
+    "compression": "^1.7.4",
     "connect-mongo": "^4.6.0",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
