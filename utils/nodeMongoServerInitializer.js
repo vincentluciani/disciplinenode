@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const session = require('express-session');
 var compression = require('compression')
 const logManager = require('./logManager.js');
+const configManager = require('./configManager.js')
 
 const mongoStoreFactory = require('connect-mongo');
 
@@ -12,10 +13,13 @@ const https = require('http');
 const options = {}
 
 const initializeServer = (routers) => {
-    var lm = new logManager('C:\\software\\react-discipline\\logs\\');
+
+    const configuration = configManager.getApplicationConfiguration();
+
+    var lm = new logManager(configuration.logDirectory);
     lm.logger.info("Environment:"+process.env.NODE_ENV)
 
-    mongoose.connect('mongodb://127.0.0.1:27017/discipline',{ useNewUrlParser: true, useUnifiedTopology: true, family: 4 })
+    mongoose.connect(configuration.database,{ useNewUrlParser: true, useUnifiedTopology: true, family: 4 })
     .then(()=> {
             console.log('Mongodb connected')
             lm.logger.info("Mongodb connected")
