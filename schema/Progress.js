@@ -1,7 +1,23 @@
+       /*
+      habitDescription
+      habitId
+      id
+      isCritical
+      isNew 
+      isSuspendableDuringOtherCases
+      isSuspendableDuringSickness
+      isTimerNecessary
+      numberOfCompletions
+      order
+      progressDate
+      target
+      timerInitialNumberOfMinutes
+       */
+
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const HabitSchema = new Schema({
+const ProgressSchema = new Schema({
     userId:{
         type:Number,
         required: true  
@@ -45,4 +61,4 @@ const HabitSchema = new Schema({
 
 })
 
-mongoose.model('habits',HabitSchema);
+mongoose.model('progress',ProgressSchema);
