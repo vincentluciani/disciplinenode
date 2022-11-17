@@ -1,18 +1,18 @@
-const http = require('http');
 const express = require('express');
 const mongoose = require('mongoose');
 const session = require('express-session');
 var compression = require('compression')
 const logManager = require('./logManager.js');
 const configManager = require('./configManager.js')
-
+var fs = require('fs');
 const mongoStoreFactory = require('connect-mongo');
 
 const app = express();
-const https = require('http');
+const http = require('http');
+const https = require('https');
 const options = {}
 
-const initializeServer = (routers) => {
+const initializeServer = (routers,protocol) => {
 
     const configuration = configManager.getApplicationConfiguration();
 
@@ -27,8 +27,38 @@ const initializeServer = (routers) => {
         )
     .catch(err => console.log(err));
 
-    var httpServer = http.createServer(options,app);
+    let httpServer
 
+    if (protocol === 'http'){       
+        httpServer = http.createServer(options,app);
+    } else {
+        var key = configuration.privateKey;
+        var cert = configuration.certificate;
+        var bundle = configuration.bundle
+
+        var keyFile = fs.readFileSync(key);
+        var certFile = fs.readFileSync(cert);
+        var bundleFile;
+        var options;
+
+        if ( null !== bundle && bundle != "" && bundle)
+        {
+        bundleFile = fs.readFileSync(bundle);  
+        options = {
+            key: keyFile,
+            ca: bundleFile,
+            cert: certFile
+        };
+        }
+        else {
+        options = {
+            key: keyFile,
+            cert: certFile
+        };
+        }
+
+        httpServer = https.createServer(options,app);
+    }
     const port = process.env.PORT ||  5000;
 
     // Parse URL-encoded bodies (as sent by HTML forms)

@@ -14,6 +14,14 @@ router.post('/', function(request, response){
     const habit = {
         userId: request.body.userId,
         habitDescription: request.body.habitDescription,
+        weekDay: request.body.weekDay,
+        isCritical: request.body.isCritical,
+        isSuspendableDuringOtherCases: request.body.isSuspendableDuringOtherCases,
+        isSuspendableDuringSickness: request.body.isSuspendableDuringSickness,
+        isTimerNecessary: request.body.isTimerNecessary,
+        order: request.body.order,
+        target: request.body.target,
+        timerInitialNumberOfMinutes: request.body.timerInitialNumberOfMinutes,
         weekDay: request.body.weekDay
     }
 
