@@ -72,6 +72,7 @@ const initializeServer = (routers,protocol) => {
     app.use(function(req,res,next){
         req.lm = lm;
         req.configuration = configuration
+        req.mongoose = mongoose
         next();
     })
 
@@ -79,6 +80,9 @@ const initializeServer = (routers,protocol) => {
         app.use(item.path,item.router);
     })
 
+    /* TODO put the auth here:
+    app.use('/auth', postReceiver, authenticationManager, function(request, response){ ......
+*/
     httpServer.listen(port,() => {
         console.log(`Server started on port ${port}`);
     });

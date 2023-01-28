@@ -28,14 +28,15 @@ router.post('/', function(request, response){
         timerInitialNumberOfMinutes: request.body.timerInitialNumberOfMinutes,
         weekDay: request.body.weekDay
     }
-
+    /* does not make sense to use this , this is calling an API !!!!!) */
     common.callServiceAndAnswer(HabitsService.storeUserHabit,habit,response,request);
 
 });
 
+/* TODO this must be on the root and not in habit, also it must be in common places*/
+router.post('/auth', postReceiver, authenticationManager.authorizationManager, function(request, response){
 
-router.post('/auth', postReceiver, authenticationManager, function(request, response){
-
+  /* todo put final handling in a middleware */
     if (request.authentication.isAuthenticated){
       response.writeHead(200, {'Content-Type': 'text/html'})
       response.end(request.authentication.picture)
