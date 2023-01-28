@@ -1,4 +1,4 @@
-const receivePostRequest = async request => {
+const postReceiver = (request,response,next) => {
 
     var body = ''
     request.on('data', function(data) {
@@ -6,9 +6,10 @@ const receivePostRequest = async request => {
       console.log('Partial body: ' + body)
     })
     request.on('end', function() {
-      return body
+      request.body = body
+      next()
     })
 
 }
 
-module.exports = receivePostRequest
+module.exports = postReceiver

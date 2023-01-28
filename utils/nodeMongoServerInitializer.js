@@ -71,6 +71,7 @@ const initializeServer = (routers,protocol) => {
     // Global variables
     app.use(function(req,res,next){
         req.lm = lm;
+        req.configuration = configuration
         next();
     })
 
