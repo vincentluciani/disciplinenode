@@ -11,7 +11,6 @@ const callServiceAndAnswer = (serviceFunction,inputObject,response,request) => {
             request.lm.logger.error('Error Processing the Request:'+  request.originalUrl)
             request.lm.logger.error(reason.message)
             request.lm.logger.error(reason.stack)
-
         })
     }
 

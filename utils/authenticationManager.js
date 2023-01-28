@@ -1,20 +1,21 @@
 const {OAuth2Client} = require('google-auth-library');
+require('./User');
 
-
-/* TODO : there should be authenticate authenticateWithCreation
+/* TODO : there should be authenticate with creation of user and just authorize api
 
 module.exports = {
   func1: func1,
   func2: func2
 }
-
+USE req.mongoose when looking for user
 */
 
-const authenticationManager =  (request, result, next) =>{
+// for api call other than auth
+const verificationManager =  (request, result, next) =>{
 
     const token=request.body.replace(/token=(\w*)/,'$1');
 
-    googleAuthenticate(token, request.configuration).then(
+    googleAuthenticate(token, request.configuration, request.mongoose).then(
         value => {
             request.authentication = value
             next();
@@ -28,39 +29,77 @@ const authenticationManager =  (request, result, next) =>{
             next();
         }
     )     
+}
 
-    // verify(token, request.configuration).then(
-    //   value => {
-    //       request.authentication = {
-    //         isAuthenticated: true,
-    //         picture: value.picture
-    //       }
-    //       const userid = value['sub'];
-    //       next();
-    //   },
-    //   reason => {
-    //       console.log(reason)
-    //       request.authentication = {
-    //         isAuthenticated: false,
-    //         picture: ''
-    //       }
-    //       next();
-    //   }
-    // )     
+// special for auth
+const authorizationManager =  (request, result, next) =>{
+
+    const token=request.body.replace(/token=(\w*)/,'$1');
+
+    authenticateAndAddUser(token, request.configuration, request.mongoose).then(
+        value => {
+            request.authentication = value
+            next();
+        },
+        reason => {
+            console.log(reason)
+            request.authentication = {
+            isAuthenticated: false,
+            picture: ''
+            }
+            next();
+        }
+    )     
+}
+
+const authenticateAndAddUser = async (token,configuration,mongoose) => {
+
+    const authentication = await googleAuthenticate(token, configuration,mongoose)
+
+    if (!authentication.applicationUser) {
+        authentication.applicationUser  = await addUser(authentication,mongoose)
+    }
+    
+    return authentication
 
 }
 
-const googleAuthenticate = async (token,configuration) => {
+const addUser = async (authentication,mongoose) => {
+    
+    const User = mongoose.model('users');
+    const newUser = {
+        userGoogleId: authentication.googleUserId,
+        userType: 'google'
+    }
+    new User(newUser).save()
+    .then(
+        (savedUser) => {
+            user = savedUser
+            return user.id
+        }
+    );
+    
+}
+
+const googleAuthenticate = async (token,configuration,mongoose) => {
 
     const payload = await verify(token, configuration);
 
-    const authentication = {
+    let authentication = {
         isAuthenticated: true,
-        picture: payload.picture
+        picture: payload.picture,
+        googleUserId: payload.sub,
+        email: payload.email
     }
-    
-    const googleUserid = payload['sub'];
-    const email = payload.email
+
+    const User = mongoose.model('users');
+    User.findOne({userGoogleId:authentication.googleUserId})
+
+    let user = await User.findOne({userGoogleId:authentication.googleUserId})
+
+    if (user){
+        authentication.applicationUser = user.id
+    }
 
     return authentication;
 
@@ -80,4 +119,9 @@ const verify = async (token,configuration) => {
     // const domain = payload['hd'];
 }
   
-module.exports = authenticationManager
+
+
+module.exports = {
+    verificationManager: verificationManager,
+    authorizationManager: authorizationManager
+  }
