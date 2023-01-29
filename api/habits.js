@@ -7,11 +7,17 @@ const postReceiver = require('../utils/postReceiver.js')
 const authenticationManager = require('../utils/authenticationManager.js')
 
 
-router.get('/:userId',(request,response)=>{
+// router.get('/:userId',(request,response)=>{
 
-    common.callServiceAndAnswer(HabitsService.getUserHabits,{userId:request.params.userId},response,request);
-}
-)  
+//     common.callServiceAndAnswer(HabitsService.getUserHabits,{userId:request.params.userId},response,request);
+// }
+// )  
+
+router.post('/get',authenticationManager.verificationManager,(request,response)=>{
+  
+  common.callServiceAndAnswer(HabitsService.getUserHabits,{userId:request.authentication.applicationUser},response,request);
+
+})
 
 router.post('/add', function(request, response){
 
@@ -29,7 +35,8 @@ router.post('/add', function(request, response){
         weekDay: request.body.weekDay
     }
     /* TODO better error handling - cannot see any error
-    TODO it seems getting the body does not require any middleware? */
+    TODO it seems getting the body does not require any middleware?
+    TODO: user id should come from middleware */
     common.callServiceAndAnswer(HabitsService.storeUserHabit,habit,response,request);
 
 });

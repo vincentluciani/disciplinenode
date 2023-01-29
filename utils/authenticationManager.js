@@ -4,7 +4,8 @@ require('./User');
 // for api call other than auth
 const verificationManager =  (request, result, next) =>{
 
-    const token=request.body.replace(/token=(\w*)/,'$1');
+    //const token=request.body.replace(/token=(\w*)/,'$1');
+    const token =  request.body.token
 
     googleAuthenticate(token, request.configuration, request.mongoose).then(
         value => {
@@ -26,6 +27,7 @@ const verificationManager =  (request, result, next) =>{
 const authorizationManager =  (request, result, next) =>{
 
     const token=request.body.replace(/token=(\w*)/,'$1');
+    //const token = request.body.token
 
     authenticateAndAddUser(token, request.configuration, request.mongoose).then(
         value => {

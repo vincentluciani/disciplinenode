@@ -7,7 +7,7 @@ const postReceiver = require('./postReceiver.js')
 const authenticationManager = require('./authenticationManager.js')
 
 
-router.post('/', postReceiver, authenticationManager.authorizationManager, function(request, response){
+router.post('/',postReceiver, authenticationManager.authorizationManager, function(request, response){
         /* todo put final handling in a middleware */
         if (request.authentication.isAuthenticated){
             response.writeHead(200, {'Content-Type': 'text/html'})
