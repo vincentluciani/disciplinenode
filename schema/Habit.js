@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const HabitSchema = new Schema({
     userId:{
-        type:Number,
+        type:String,
         required: true  
       },
     habitDescription:{
