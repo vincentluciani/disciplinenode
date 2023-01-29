@@ -13,7 +13,7 @@ router.get('/:userId',(request,response)=>{
 }
 )  
 
-router.post('/', function(request, response){
+router.post('/add', function(request, response){
 
     const habit = {
         userId: request.body.userId,
@@ -28,24 +28,18 @@ router.post('/', function(request, response){
         timerInitialNumberOfMinutes: request.body.timerInitialNumberOfMinutes,
         weekDay: request.body.weekDay
     }
-    /* does not make sense to use this , this is calling an API !!!!!) */
+    /* TODO better error handling - cannot see any error
+    TODO it seems getting the body does not require any middleware? */
     common.callServiceAndAnswer(HabitsService.storeUserHabit,habit,response,request);
 
 });
 
 /* TODO this must be on the root and not in habit, also it must be in common places*/
-router.post('/auth', postReceiver, authenticationManager.authorizationManager, function(request, response){
+// router.post('/auth', postReceiver, authenticationManager.authorizationManager, function(request, response){
 
-  /* todo put final handling in a middleware */
-    if (request.authentication.isAuthenticated){
-      response.writeHead(200, {'Content-Type': 'text/html'})
-      response.end(request.authentication.picture)
-    } else {
-      response.writeHead(401, {'Content-Type': 'text/html'})
-      response.end("Authentication Failed")
-    }
 
-});
+
+// });
 
 
 module.exports = router;

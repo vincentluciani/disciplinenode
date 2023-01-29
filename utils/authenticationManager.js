@@ -1,15 +1,6 @@
 const {OAuth2Client} = require('google-auth-library');
 require('./User');
 
-/* TODO : there should be authenticate with creation of user and just authorize api
-
-module.exports = {
-  func1: func1,
-  func2: func2
-}
-USE req.mongoose when looking for user
-*/
-
 // for api call other than auth
 const verificationManager =  (request, result, next) =>{
 

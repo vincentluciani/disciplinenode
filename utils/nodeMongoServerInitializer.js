@@ -6,6 +6,9 @@ const logManager = require('./logManager.js');
 const configManager = require('./configManager.js')
 var fs = require('fs');
 const mongoStoreFactory = require('connect-mongo');
+const postReceiver = require('../utils/postReceiver.js')
+const authenticationManager = require('../utils/authenticationManager.js')
+const authRouter= require('./auth');
 
 const app = express();
 const http = require('http');
@@ -80,9 +83,8 @@ const initializeServer = (routers,protocol) => {
         app.use(item.path,item.router);
     })
 
-    /* TODO put the auth here:
-    app.use('/auth', postReceiver, authenticationManager, function(request, response){ ......
-*/
+    app.use('/auth',authRouter);
+
     httpServer.listen(port,() => {
         console.log(`Server started on port ${port}`);
     });
