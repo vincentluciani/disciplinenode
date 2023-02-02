@@ -19,10 +19,10 @@ router.post('/get',authenticationManager.verificationManager,(request,response)=
 
 })
 
-router.post('/add', function(request, response){
+router.post('/add',authenticationManager.verificationManager, (request, response)=>{
 
     const habit = {
-        userId: request.body.userId,
+        userId: request.authentication.applicationUser,
         habitDescription: request.body.habitDescription,
         weekDay: request.body.weekDay,
         isCritical: request.body.isCritical,
@@ -36,17 +36,10 @@ router.post('/add', function(request, response){
     }
     /* TODO better error handling - cannot see any error
     TODO it seems getting the body does not require any middleware?
-    TODO: user id should come from middleware */
+    TODO: user id should come from middleware
+    TODO: need to get back the id of the habit */
     common.callServiceAndAnswer(HabitsService.storeUserHabit,habit,response,request);
 
 });
-
-/* TODO this must be on the root and not in habit, also it must be in common places*/
-// router.post('/auth', postReceiver, authenticationManager.authorizationManager, function(request, response){
-
-
-
-// });
-
 
 module.exports = router;
