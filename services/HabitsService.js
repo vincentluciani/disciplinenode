@@ -16,7 +16,23 @@ const storeUserHabit = async (habitObject) => {
   /* check if what is returned is what was given */
 }
 
+const deleteUserHabit = async (queryObject) => {
+  return await model.deleteOne({habitId:queryObject.habitId})
+  /* check if what is returned is what was given */
+}
+
+/* https://www.mongodb.com/docs/drivers/node/current/usage-examples/updateOne/ */
+const updateUserHabit = async (id,habitObject) => {
+  const habit = new model(habitObject)
+  return await habit.update({'_id':ObjectID(id)}, {$set: habitObject}, {w:1}, function(err, result){
+    console.log(result);
+  })
+  /* check if what is returned is what was given */
+}
+
 module.exports = {
   getUserHabits: getUserHabits,
-  storeUserHabit: storeUserHabit
+  storeUserHabit: storeUserHabit,
+  updateUserHabit: updateUserHabit,
+  deleteUserHabit: deleteUserHabit
 }
