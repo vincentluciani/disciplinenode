@@ -14,8 +14,19 @@ const authenticationManager = require('../utils/authenticationManager.js')
 // )  
 
 router.post('/get',authenticationManager.verificationManager,(request,response)=>{
-  
+  /* todo:
+  can do middleware for output first*/
   common.callServiceAndAnswer(HabitsService.getUserHabits,{userId:request.authentication.applicationUser},response,request);
+
+})
+
+router.post('/getall',authenticationManager.verificationManager,(request,response)=>{
+  /* todo:
+  dataArrays.todaysProgressArray
+  dataArrays.progressArray 
+  dataArrays.habitsArray
+  can do middleware for output first*/
+  common.callServiceAndAnswer(HabitsService.getAll,{userId:request.authentication.applicationUser},response,request);
 
 })
 

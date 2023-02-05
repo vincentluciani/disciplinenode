@@ -1,8 +1,9 @@
 
-require('../schema/Habit');
-const mongoose = require('mongoose');
-const model = mongoose.model('habits');
-
+require('../schema/Habit')
+require('../schema/Progress')
+const mongoose = require('mongoose')
+const model = mongoose.model('habits')
+const progressModel = mongoose.model('progress')
 
 const getUserHabits = async (queryObject) => {
   return await model.find({userId:queryObject.userId})
@@ -10,6 +11,22 @@ const getUserHabits = async (queryObject) => {
 .lean()*/
 }
 
+const getAll = async (queryObject) => {
+/*
+  dataArrays.todaysProgressArray
+  dataArrays.progressArray 
+  dataArrays.habitsArray
+*/
+
+  var resultObject = {}
+  /*resultObject.progressArray = await progressModel.find({userId:queryObject.userId})
+  resultObject.todaysProgressArray = await progressModel.find({userId:queryObject.userId})*/
+  resultObject.progressArray=[]
+  resultObject.todaysProgressArray = []
+  resultObject.habitsArray =  await model.find({userId:queryObject.userId})
+  resultObject.journalArray = []
+  return resultObject
+}
 const storeUserHabit = async (habitObject) => {
   const habit = new model(habitObject)
   return await habit.save() 
@@ -34,5 +51,6 @@ module.exports = {
   getUserHabits: getUserHabits,
   storeUserHabit: storeUserHabit,
   updateUserHabit: updateUserHabit,
-  deleteUserHabit: deleteUserHabit
+  deleteUserHabit: deleteUserHabit,
+  getAll: getAll
 }

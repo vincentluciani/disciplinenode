@@ -1,9 +1,9 @@
 const callServiceAndAnswer = (serviceFunction,inputObject,response,request) => {
     serviceFunction(inputObject).
     then(value => {
-        let result = {"result":value};
+        //let result = {"result":value};
         response.setHeader('Content-Type', 'application/json');
-        response.end(JSON.stringify(result));
+        response.end(JSON.stringify(value));
         console.log(value);
         }, reason => {
             response.statusCode = 500;
