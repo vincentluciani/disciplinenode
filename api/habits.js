@@ -34,6 +34,7 @@ router.post('/add',authenticationManager.verificationManager, (request, response
 
     const habit = {
         userId: request.authentication.applicationUser,
+        id: request.body.habitId,
         habitDescription: request.body.habitDescription,
         weekDay: request.body.weekDay,
         isCritical: request.body.isCritical,

@@ -20,7 +20,7 @@ const Schema = mongoose.Schema;
 const ProgressSchema = new Schema({
   id:{
     type:String,
-    required: false  
+    required: true  
   },
   userId:{
     type:String,
@@ -32,23 +32,23 @@ const ProgressSchema = new Schema({
   },
   isCritical:{
     type:Boolean,
-    required: true  
+    required: false  
   },
   isSuspendableDuringOtherCases:{
     type:Boolean,
-    required: true  
+    required: false  
   },
   isSuspendableDuringSickness:{
     type:Boolean,
-    required: true  
+    required: false  
   },
   isTimerNecessary:{
     type:Boolean,
-    required: true  
+    required: false  
   },
   order:{
     type:Number,
-    required: true  
+    required: false  
   },
   target:{
     type:Number,
@@ -56,7 +56,7 @@ const ProgressSchema = new Schema({
   },
   timerInitialNumberOfMinutes:{
     type:Number,
-    required: true  
+    required: false  
   },
   weekDay:{
       type:String,

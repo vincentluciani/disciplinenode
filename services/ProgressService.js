@@ -1,7 +1,7 @@
 
-require('../schema/Habit');
+require('../schema/Progress');
 const mongoose = require('mongoose');
-const model = mongoose.model('habits');
+const model = mongoose.model('progress');
 
 
 const getUserProgressForDate = async (queryObject) => {
@@ -11,8 +11,8 @@ const getUserProgressForDate = async (queryObject) => {
 }
 
 const storeUserProgress = async (progressObject) => {
-  const habit = new model(progressObject)
-  return await habit.save() 
+  const progress = new model(progressObject)
+  return await progress.save() 
   /* check if what is returned is what was given */
 }
 

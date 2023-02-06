@@ -6,29 +6,33 @@ const HabitSchema = new Schema({
         type:String,
         required: true  
       },
+    id:{
+        type:Number,
+        required: true  
+      },
     habitDescription:{
       type:String,
       required: true  
     },
     isCritical:{
       type:Boolean,
-      required: true  
+      required: false  
     },
     isSuspendableDuringOtherCases:{
       type:Boolean,
-      required: true  
+      required: false  
     },
     isSuspendableDuringSickness:{
       type:Boolean,
-      required: true  
+      required: false  
     },
     isTimerNecessary:{
       type:Boolean,
-      required: true  
+      required: false  
     },
     order:{
       type:Number,
-      required: true  
+      required: false  
     },
     target:{
       type:Number,
@@ -36,7 +40,7 @@ const HabitSchema = new Schema({
     },
     timerInitialNumberOfMinutes:{
       type:Number,
-      required: true  
+      required: false  
     },
     weekDay:{
         type:String,
