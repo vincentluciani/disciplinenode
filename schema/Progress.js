@@ -18,7 +18,11 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const ProgressSchema = new Schema({
-  id:{
+  progressId:{
+    type:String,
+    required: true  
+  },
+  habitId:{
     type:String,
     required: true  
   },
@@ -31,19 +35,19 @@ const ProgressSchema = new Schema({
     required: true  
   },
   isCritical:{
-    type:Boolean,
+    type:String,
     required: false  
   },
   isSuspendableDuringOtherCases:{
-    type:Boolean,
+    type:String,
     required: false  
   },
   isSuspendableDuringSickness:{
-    type:Boolean,
+    type:String,
     required: false  
   },
   isTimerNecessary:{
-    type:Boolean,
+    type:String,
     required: false  
   },
   order:{
@@ -64,6 +68,10 @@ const ProgressSchema = new Schema({
     },
     progressDate:{
       type:String,
+      required: true  
+    },
+    progressDateISO:{
+      type:Date,
       required: true  
     },
     numberOfCompletions:{

@@ -26,7 +26,7 @@ router.post('/getall',authenticationManager.verificationManager,(request,respons
   dataArrays.progressArray 
   dataArrays.habitsArray
   can do middleware for output first*/
-  common.callServiceAndAnswer(HabitsService.getAll,{userId:request.authentication.applicationUser},response,request);
+  common.callServiceAndAnswer(HabitsService.getAll,{userId:request.authentication.applicationUser,progressDate:request.body.requestDate},response,request);
 
 })
 
@@ -34,7 +34,7 @@ router.post('/add',authenticationManager.verificationManager, (request, response
 
     const habit = {
         userId: request.authentication.applicationUser,
-        id: request.body.habitId,
+        habitId: request.body.habitId,
         habitDescription: request.body.habitDescription,
         weekDay: request.body.weekDay,
         isCritical: request.body.isCritical,
