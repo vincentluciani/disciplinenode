@@ -45,7 +45,7 @@ const deleteUserHabit = async (queryObject) => {
 
 /* https://www.mongodb.com/docs/drivers/node/current/usage-examples/updateOne/ */
 const updateUserHabit = async (id,habitObject) => {
-  const habit = new model(habitObject)
+  const habit = new habitsModel(habitObject)
   return await habit.update({'_id':ObjectID(id)}, {$set: habitObject}, {w:1}, function(err, result){
     console.log(result);
   })
@@ -59,11 +59,17 @@ const getUserProgressForDate = async (queryObject) => {
 }
 
 const getUserProgressBeforeDate = async (queryObject) => {
-  return await progressModel.find({userId:queryObject.userId,progressDateISO:{
-    $lt:ISODate(queryObject.progressDateISO)
-  }})
-      /*.sort({date:'desc'})
-.lean()*/
+  const isoDate = queryObject.progressDate+"T00:00:00.000Z"
+  try{
+    result = await progressModel.find({userId:queryObject.userId,progressDateISO:{
+      $lt:isoDate
+    }})
+        /*.sort({date:'desc'})
+  .lean()*/
+  } catch(err) {
+    console.log(err)
+  }
+  return result;
 }
 
 const getAllUserProgress = async (queryObject) => {
@@ -80,7 +86,7 @@ const storeUserProgress = async (progressObject) => {
   //   ...progressObject,
   //   progressDateISO: ISODate(isoDate)
   // })
-  const progress = new model(progressObject)
+  const progress = new progressModel(progressObject)
   result = progress.save(function (err) {
     if (err) {
       return handleError(err);
