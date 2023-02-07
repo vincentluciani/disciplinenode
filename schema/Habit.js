@@ -6,7 +6,7 @@ const HabitSchema = new Schema({
         type:String,
         required: true  
       },
-    id:{
+    habitId:{
         type:Number,
         required: true  
       },
