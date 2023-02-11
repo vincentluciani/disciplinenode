@@ -23,7 +23,7 @@ const jwtValidate = async (token) =>{
         expiresIn : '1d'
         //iat : nowSeconds
     };
-    jwt.verify(token, 'test1secret', jwtOptions, function (err, decoded) {
+    /*jwt.verify(token, 'test1secret', jwtOptions, function (err, decoded) {
         if (err) {
             let errordata = {
                 message: err.message,
@@ -35,7 +35,16 @@ const jwtValidate = async (token) =>{
 
         console.log(decoded);
         return decoded;
-    });
+    });*/
+    try{
+        const jwtResult = await jwt.verify(token, 'test1secret', jwtOptions)
+        return jwtResult
+    } catch(e) {
+        console.log(e)
+        return null
+    }
+
+
 }
 module.exports = {
     jwtCreate: jwtCreate,

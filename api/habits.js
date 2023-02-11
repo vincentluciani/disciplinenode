@@ -16,7 +16,7 @@ const authenticationManager = require('../utils/authenticationManager.js')
 router.post('/get',authenticationManager.verificationManager,(request,response)=>{
   /* todo:
   can do middleware for output first*/
-  common.callServiceAndAnswer(HabitsService.getUserHabits,{userId:request.authentication.applicationUser},response,request);
+  common.callServiceAndAnswer(HabitsService.getUserHabits,{userId:request.authentication.applicationUserId},response,request);
 
 })
 
@@ -26,14 +26,14 @@ router.post('/getall',authenticationManager.verificationManager,(request,respons
   dataArrays.progressArray 
   dataArrays.habitsArray
   can do middleware for output first*/
-  common.callServiceAndAnswer(HabitsService.getAll,{userId:request.authentication.applicationUser,progressDate:request.body.requestDate},response,request);
+  common.callServiceAndAnswer(HabitsService.getAll,{userId:request.authentication.applicationUserId,progressDate:request.body.requestDate},response,request);
 
 })
 
 router.post('/add',authenticationManager.verificationManager, (request, response)=>{
 
     const habit = {
-        userId: request.authentication.applicationUser,
+        userId: request.authentication.applicationUserId,
         habitId: request.body.habitId,
         habitDescription: request.body.habitDescription,
         weekDay: request.body.weekDay,

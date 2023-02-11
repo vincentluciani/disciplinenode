@@ -12,10 +12,10 @@ router.post('/',postReceiver, authenticationManager.authorizationManager, functi
         if (request.authentication.isAuthenticated){
             response.writeHead(200, {'Content-Type': 'text/html'})
             /* todo: should return our own token */
-            response.end({
+            response.end(JSON.stringify({
                 applicationJwtToken: request.authentication.applicationJwtToken,
                 picture:request.authentication.picture
-            })
+            }))
         } else {
             response.writeHead(401, {'Content-Type': 'text/html'})
             response.end("Authentication Failed")

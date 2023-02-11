@@ -87,12 +87,13 @@ const storeUserProgress = async (progressObject) => {
   //   progressDateISO: ISODate(isoDate)
   // })
   const progress = new progressModel(progressObject)
-  result = progress.save(function (err) {
-    if (err) {
-      return handleError(err);
-    }
-    // saved!
-  });
+
+    try{
+      result = await progress.save()
+  } catch(e){
+    console.log(e)
+    return null
+  }
   /* check if what is returned is what was given */
   return result
 }

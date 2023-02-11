@@ -5,7 +5,7 @@ const common = require('../utils/requestManager')
 const authenticationManager = require('../utils/authenticationManager.js')
 
 router.post('/get',(request,response)=>{
-    common.callServiceAndAnswer(HabitsService.getUserProgressArray,{userId:request.authentication.applicationUser,date:request.query.date},response,request);
+    common.callServiceAndAnswer(HabitsService.getUserProgressArray,{userId:request.authentication.applicationUserId,date:request.query.date},response,request);
 }
 )  
 
@@ -16,7 +16,7 @@ router.post('/add',authenticationManager.verificationManager,  function(request,
     const progress = {
         progressId: request.body.progressId,
         habitId: request.body.habitId,
-        userId: request.authentication.applicationUser,
+        userId: request.authentication.applicationUserId,
         habitDescription: request.body.habitDescription,
         isCritical: request.body.isCritical,
         isSuspendableDuringOtherCases: request.body.isSuspendableDuringOtherCases,

@@ -34,7 +34,7 @@ const authorizationManager =  (request, result, next) =>{
     authenticateAndAddUser(token, request.configuration, request.mongoose).then(
         value => {
             request.authentication = value
-            next();
+            next()
         },
         reason => {
             console.log(reason)
@@ -59,7 +59,7 @@ const authenticateAndAddUser = async (token,configuration,mongoose) => {
     const userInformation = {
         userId:authentication.applicationUser
     }
-    const applicationJwtToken = await jwtCreate.jwtManager(userInformation)
+    const applicationJwtToken = await jwtManager.jwtCreate(userInformation)
     authentication.applicationJwtToken = applicationJwtToken
     
     return authentication
@@ -95,7 +95,7 @@ const googleAuthenticate = async (token,configuration,mongoose) => {
     }
 
     const User = mongoose.model('users');
-    User.findOne({userGoogleId:authentication.googleUserId})
+    //User.findOne({userGoogleId:authentication.googleUserId})
 
     let user = await User.findOne({userGoogleId:authentication.googleUserId})
 
@@ -110,7 +110,7 @@ const googleAuthenticate = async (token,configuration,mongoose) => {
 
 const applicationAuthenticate = async (token,configuration,mongoose) => {
 
-    const payload = await jwtManager(token);
+    const payload = await jwtManager.jwtValidate(token);
 
     const User = mongoose.model('users');
     //User.findOne({_id: payload.userId})
