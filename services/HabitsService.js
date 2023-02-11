@@ -33,9 +33,23 @@ const getAll = async (queryObject) => {
   return resultObject
 }
 const storeUserHabit = async (habitObject) => {
-  const habit = new habitsModel(habitObject)
-  return await habit.save() 
-  /* check if what is returned is what was given */
+  //const habit = new habitsModel(habitObject)
+  //return await habit.save() 
+
+  var query = {},
+    update = habitObject,
+    options = { upsert: true, new: true, setDefaultsOnInsert: true };
+
+// Find the document
+try{
+  result = await habitsModel.findOneAndUpdate(query, update, options)
+} catch(e){
+    console.log(e)
+    return null
+} 
+return result
+
+
 }
 
 const deleteUserHabit = async (queryObject) => {
@@ -81,21 +95,38 @@ const getAllUserProgress = async (queryObject) => {
 
 const storeUserProgress = async (progressObject) => {
   const isoDate = progressObject.progressDate+"T00:00:00.000Z"
-
   // const progress = new model(      {
-  //   ...progressObject,
-  //   progressDateISO: ISODate(isoDate)
+  //     ...progressObject,
+  //     progressDateISO: isoDate
   // })
-  const progress = new progressModel(progressObject)
-
-    try{
-      result = await progress.save()
-  } catch(e){
-    console.log(e)
-    return null
+  const modifiedProgressObject = {
+      ...progressObject,
+      progressDateISO: isoDate
   }
+
+
+
+  //const progress = new progressModel(progressObject)
+
+  //   try{
+  //     result = await progress.save()
+  // } catch(e){
+  //   console.log(e)
+  //   return null
+  // }
   /* check if what is returned is what was given */
+  var query = {},
+  update = modifiedProgressObject,
+  options = { upsert: true, new: true, setDefaultsOnInsert: true };
+
+  try{
+    result = await progressModel.findOneAndUpdate(query, update, options)
+  } catch(e){
+      console.log(e)
+      return null
+  } 
   return result
+
 }
 
 module.exports = {
