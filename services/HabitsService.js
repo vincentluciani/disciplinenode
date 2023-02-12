@@ -32,11 +32,14 @@ const getAll = async (queryObject) => {
 
   return resultObject
 }
+
+
+
 const storeUserHabit = async (habitObject) => {
   //const habit = new habitsModel(habitObject)
   //return await habit.save() 
 
-  var query = {},
+  var query = {habitId:habitObject.habitId},
     update = habitObject,
     options = { upsert: true, new: true, setDefaultsOnInsert: true };
 
@@ -53,6 +56,7 @@ return result
 }
 
 const deleteUserHabit = async (queryObject) => {
+  /* delete progress also ? */
   return await habitsModel.deleteOne({habitId:queryObject.habitId})
   /* check if what is returned is what was given */
 }
@@ -115,7 +119,7 @@ const storeUserProgress = async (progressObject) => {
   //   return null
   // }
   /* check if what is returned is what was given */
-  var query = {},
+  var query = {progressId:progressObject.progressId},
   update = modifiedProgressObject,
   options = { upsert: true, new: true, setDefaultsOnInsert: true };
 
