@@ -39,7 +39,7 @@ const storeUserHabit = async (habitObject) => {
   //const habit = new habitsModel(habitObject)
   //return await habit.save() 
 
-  var query = {habitId:habitObject.habitId},
+  var query = {habitId:habitObject.habitId,userId:habitObject.userId},
     update = habitObject,
     options = { upsert: true, new: true, setDefaultsOnInsert: true };
 
@@ -119,7 +119,7 @@ const storeUserProgress = async (progressObject) => {
   //   return null
   // }
   /* check if what is returned is what was given */
-  var query = {progressId:progressObject.progressId},
+  var query = {progressId:progressObject.progressId,userId:progressObject.userId},
   update = modifiedProgressObject,
   options = { upsert: true, new: true, setDefaultsOnInsert: true };
 
