@@ -1,12 +1,13 @@
 
 require('../schema/Habit')
 require('../schema/Progress')
-require('../schema/Progress');
+require('../schema/Journal');
 const { query } = require('express');
 
 const mongoose = require('mongoose')
 const habitsModel = mongoose.model('habits')
 const progressModel = mongoose.model('progress')
+const journalModel = mongoose.model('journal')
 
 const getUserHabits = async (queryObject) => {
   return await habitsModel.find({userId:queryObject.userId})
@@ -28,7 +29,7 @@ const getAll = async (queryObject) => {
   resultObject.todaysProgressArray = await getUserProgressForDate(queryObject)
   resultObject.habitsArray =  await habitsModel.find({userId:queryObject.userId})
   resultObject.pastProgressArray = await getUserProgressBeforeDate(queryObject)
-  resultObject.journalArray = []
+  resultObject.journalArray = await getUserJournal(queryObject)
 
   return resultObject
 }
@@ -76,6 +77,20 @@ const getUserProgressForDate = async (queryObject) => {
 .lean()*/
 }
 
+
+const getUserJournalForDate = async (queryObject) => {
+  return await journalModel.find({userId:queryObject.userId,journalDate:queryObject.date})
+      /*.sort({date:'desc'})
+.lean()*/
+}
+
+const getUserJournal = async (queryObject) => {
+  return await journalModel.find({userId:queryObject.userId})
+      /*.sort({date:'desc'})
+.lean()*/
+}
+
+
 const getUserProgressBeforeDate = async (queryObject) => {
   const isoDate = queryObject.progressDate+"T00:00:00.000Z"
   try{
@@ -96,7 +111,22 @@ const getAllUserProgress = async (queryObject) => {
 .lean()*/
 }
 
+const storeUserJournal = async (journalObject) => {
 
+
+  var query = {journalDate:journalObject.journalDate,userId:journalObject.userId},
+    update = journalObject,
+    options = { upsert: true, new: true, setDefaultsOnInsert: true };
+
+  // Find the document
+  try{
+    result = await journalModel.findOneAndUpdate(query, update, options)
+  } catch(e){
+      console.log(e)
+      return null
+  } 
+  return result
+}
 const storeUserProgress = async (progressObject) => {
   const isoDate = progressObject.progressDate+"T00:00:00.000Z"
   // const progress = new model(      {
@@ -107,9 +137,7 @@ const storeUserProgress = async (progressObject) => {
       ...progressObject,
       progressDateISO: isoDate
   }
-
-
-
+  
   //const progress = new progressModel(progressObject)
 
   //   try{
@@ -139,5 +167,7 @@ module.exports = {
   updateUserHabit: updateUserHabit,
   deleteUserHabit: deleteUserHabit,
   getAll: getAll,
-  storeUserProgress: storeUserProgress
+  storeUserProgress: storeUserProgress,
+  storeUserJournal: storeUserJournal,
+  getUserJournalForDate: getUserJournalForDate
 }

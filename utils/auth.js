@@ -14,7 +14,9 @@ router.post('/',postReceiver, authenticationManager.authorizationManager, functi
             /* todo: should return our own token */
             response.end(JSON.stringify({
                 applicationJwtToken: request.authentication.applicationJwtToken,
-                picture:request.authentication.picture
+                picture:request.authentication.picture,
+                familyName:request.authentication.familyName,
+                givenName:request.authentication.givenName
             }))
         } else {
             response.writeHead(401, {'Content-Type': 'text/html'})
