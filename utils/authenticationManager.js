@@ -91,7 +91,9 @@ const googleAuthenticate = async (token,configuration,mongoose) => {
         isAuthenticated: true,
         picture: payload.picture,
         googleUserId: payload.sub,
-        email: payload.email
+        email: payload.email,
+        familyName: payload.family_name,
+        givenName: payload.given_name
     }
 
     const User = mongoose.model('users');
