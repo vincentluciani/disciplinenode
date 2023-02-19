@@ -58,9 +58,16 @@ return result
 
 const deleteUserHabit = async (queryObject) => {
   /* delete progress also ? */
-  return await habitsModel.deleteOne({habitId:queryObject.habitId})
+  return await habitsModel.deleteOne({habitId:queryObject.id,userId:queryObject.userId})
   /* check if what is returned is what was given */
 }
+
+const deleteUserProgress = async (queryObject) => {
+  /* delete progress also ? */
+  return await progressModel.deleteOne({progressId:queryObject.id,userId:queryObject.userId})
+  /* check if what is returned is what was given */
+}
+
 
 /* https://www.mongodb.com/docs/drivers/node/current/usage-examples/updateOne/ */
 const updateUserHabit = async (id,habitObject) => {
@@ -166,6 +173,7 @@ module.exports = {
   storeUserHabit: storeUserHabit,
   updateUserHabit: updateUserHabit,
   deleteUserHabit: deleteUserHabit,
+  deleteUserProgress: deleteUserProgress,
   getAll: getAll,
   storeUserProgress: storeUserProgress,
   storeUserJournal: storeUserJournal,

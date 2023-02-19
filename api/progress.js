@@ -9,6 +9,11 @@ router.post('/get',(request,response)=>{
 }
 )  
 
+router.post('/delete',authenticationManager.verificationManager,(request,response)=>{
+    common.callServiceAndAnswer(HabitsService.deleteUserProgress,{userId:request.authentication.applicationUserId,id:request.body.id},response,request);
+}
+)  
+
 router.post('/add',authenticationManager.verificationManager,  function(request, response){
 
     const isoDate = request.body.progressDate+"T00:00:00.000Z"
