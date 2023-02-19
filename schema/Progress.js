@@ -35,19 +35,19 @@ const ProgressSchema = new Schema({
     required: true  
   },
   isCritical:{
-    type:String,
+    type:Boolean,
     required: false  
   },
   isSuspendableDuringOtherCases:{
-    type:String,
+    type:Boolean,
     required: false  
   },
   isSuspendableDuringSickness:{
-    type:String,
+    type:Boolean,
     required: false  
   },
   isTimerNecessary:{
-    type:String,
+    type:Boolean,
     required: false  
   },
   order:{
