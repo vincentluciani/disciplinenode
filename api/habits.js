@@ -20,6 +20,11 @@ router.post('/get',authenticationManager.verificationManager,(request,response)=
 
 })
 
+router.post('/delete',authenticationManager.verificationManager,(request,response)=>{
+  common.callServiceAndAnswer(HabitsService.deleteUserHabit,{userId:request.authentication.applicationUserId,id:request.body.id},response,request);
+}
+) 
+
 router.post('/getall',authenticationManager.verificationManager,(request,response)=>{
   /* todo:
   dataArrays.todaysProgressArray
