@@ -1,19 +1,3 @@
-       /*
-      habitDescription
-      habitId
-      id
-      isCritical
-      isNew 
-      isSuspendableDuringOtherCases
-      isSuspendableDuringSickness
-      isTimerNecessary
-      numberOfCompletions
-      order
-      progressDate
-      target
-      timerInitialNumberOfMinutes
-       */
-
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
@@ -75,10 +59,9 @@ const ProgressSchema = new Schema({
       required: true  
     },
     numberOfCompletions:{
-      type:String,
+      type:Number,
       required: true  
     }
-
 })
 
 mongoose.model('progress',ProgressSchema);

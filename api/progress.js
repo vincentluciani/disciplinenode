@@ -6,13 +6,11 @@ const authenticationManager = require('../utils/authenticationManager.js')
 
 router.post('/get',(request,response)=>{
     common.callServiceAndAnswer(HabitsService.getUserProgressArray,{userId:request.authentication.applicationUserId,date:request.query.date},response,request);
-}
-)  
+})  
 
 router.post('/delete',authenticationManager.verificationManager,(request,response)=>{
     common.callServiceAndAnswer(HabitsService.deleteUserProgress,{userId:request.authentication.applicationUserId,id:request.body.id},response,request);
-}
-)  
+})  
 
 router.post('/add',authenticationManager.verificationManager,  function(request, response){
 
@@ -35,11 +33,7 @@ router.post('/add',authenticationManager.verificationManager,  function(request,
         progressDate: request.body.progressDate,
         numberOfCompletions: request.body.numberOfCompletions
     }
-/* todo: user id should come from the middleware*/
     common.callServiceAndAnswer(HabitsService.storeUserProgress,progress,response,request);
-
-  });
-
-
+});
 
 module.exports = router;
