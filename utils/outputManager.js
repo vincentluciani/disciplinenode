@@ -4,7 +4,7 @@ const outputResults = (request, result, next) => {
         handlePositiveResult(result.apiResult.object)
         lm.logger.info("successful api call")
     } else {
-        handleNegativeResult();
+        handleNegativeResult(result.apiResult.status);
         lm.logger.error("Error in the api:"+result.apiResult.error)
     }
 }

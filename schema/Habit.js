@@ -46,7 +46,6 @@ const HabitSchema = new Schema({
         type:String,
         required: true  
       }
-
 })
 
 mongoose.model('habits',HabitSchema);

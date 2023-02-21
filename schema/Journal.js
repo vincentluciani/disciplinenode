@@ -18,7 +18,6 @@ const JournalSchema = new Schema({
     type:String,
     required: true  
   }
-  
 })
 
 mongoose.model('journal',JournalSchema);
