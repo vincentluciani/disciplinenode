@@ -45,7 +45,23 @@ const HabitSchema = new Schema({
     weekDay:{
         type:String,
         required: true  
-      }
+      },
+    whatUpdated:{
+      type:String,
+      required: false  
+    },
+    whatCreated:{
+      type:String,
+      required: false  
+    },
+    whenUpdated:{
+      type:String,
+      required: false  
+    },
+    whenCreated:{
+      type:String,
+      required: false  
+    }
 })
 
 mongoose.model('habits',HabitSchema);
