@@ -46,6 +46,10 @@ const ProgressSchema = new Schema({
     type:Number,
     required: false  
   },
+  status:{
+    type:String,
+    required: true  
+  },
   weekDay:{
       type:String,
       required: true  
@@ -61,6 +65,22 @@ const ProgressSchema = new Schema({
     numberOfCompletions:{
       type:Number,
       required: true  
+    },
+    whatUpdated:{
+      type:String,
+      required: false  
+    },
+    whatCreated:{
+      type:String,
+      required: false  
+    },
+    whenUpdated:{
+      type:String,
+      required: false  
+    },
+    whenCreated:{
+      type:String,
+      required: false  
     }
 })
 

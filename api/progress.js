@@ -25,13 +25,18 @@ router.post('/add',authenticationManager.verificationManager,  function(request,
         isSuspendableDuringOtherCases: request.body.isSuspendableDuringOtherCases,
         isSuspendableDuringSickness: request.body.isSuspendableDuringSickness,
         isTimerNecessary: request.body.isTimerNecessary,
+        status: request.body.status,
         order: request.body.order,
         target: request.body.target,
         timerInitialNumberOfMinutes: request.body.timerInitialNumberOfMinutes,
         weekDay: request.body.weekDay,
         progressDateISO:isoDate,
         progressDate: request.body.progressDate,
-        numberOfCompletions: request.body.numberOfCompletions
+        numberOfCompletions: request.body.numberOfCompletions,
+        whatUpdated: request.body.whatUpdated,
+        whenUpdated: request.body.whenUpdated,
+        whatCreated: request.body.whatCreated?request.body.whatCreated:'',
+        whenCreated: request.body.whenCreated?request.body.whenCreated:''
     }
     common.callServiceAndAnswer(HabitsService.storeUserProgress,progress,response,request);
 });

@@ -31,7 +31,11 @@ router.post('/add',authenticationManager.verificationManager, (request, response
         order: request.body.order,
         target: request.body.target,
         timerInitialNumberOfMinutes: request.body.timerInitialNumberOfMinutes,
-        weekDay: request.body.weekDay
+        weekDay: request.body.weekDay,
+        whatUpdated: request.body.whatUpdated,
+        whenUpdated: request.body.whenUpdated,
+        whatCreated: request.body.whatCreated?request.body.whatCreated:'',
+        whenCreated: request.body.whenCreated?request.body.whenCreated:''
     }
     common.callServiceAndAnswer(HabitsService.storeUserHabit,habit,response,request);
 
