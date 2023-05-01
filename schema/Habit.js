@@ -64,4 +64,6 @@ const HabitSchema = new Schema({
     }
 })
 
+HabitSchema.index({ user: 1, habitId: 1 }, { unique: true })
+
 mongoose.model('habits',HabitSchema);

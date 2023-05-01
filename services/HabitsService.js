@@ -6,6 +6,7 @@ const { query } = require('express');
 
 const mongoose = require('mongoose')
 const habitsModel = mongoose.model('habits')
+
 const progressModel = mongoose.model('progress')
 const journalModel = mongoose.model('journal')
 
