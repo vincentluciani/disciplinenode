@@ -31,14 +31,14 @@ router.post('/',postReceiver, authenticationManager.authorizationManager, functi
         if (request.body){
 
             userData={userId:'e434343434'}
-            jwtCreator.jwtCreate(userData).then(
+            jwtCreator.jwtCreate(userData,request).then(
                 value => {
-                    console.log(value)
+                    request.lm.logger.info(value)
                     response.writeHead(200, {'Content-Type': 'text/html'})
                     response.end(value)
                 },
                 reason => {
-                    console.log(reason)
+                    request.lm.logger.error(reason)
                     response.writeHead(401, {'Content-Type': 'text/html'})
                     response.end(reason)
                 }
@@ -56,12 +56,12 @@ router.post('/',postReceiver, authenticationManager.authorizationManager, functi
         if (request.body){
             var token = request.headers['x-access-token']
 
-            jwtCreator.jwtValidate(token).then(
+            jwtCreator.jwtValidate(token,request).then(
                 value => {
-                    console.log(value)
+                    request.lm.logger.info(value)
                 },
                 reason => {
-                    console.log(reason)
+                    request.lm.logger.error(reason)
                 }
             )
 

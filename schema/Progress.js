@@ -84,4 +84,6 @@ const ProgressSchema = new Schema({
     }
 })
 
+ProgressSchema.index({ user: 1, habit: 1, date: 1 }, { unique: true })
+
 mongoose.model('progress',ProgressSchema);

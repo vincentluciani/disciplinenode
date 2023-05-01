@@ -8,19 +8,25 @@ const verificationManager =  (request, result, next) =>{
 
     //const token=request.body.replace(/token=(\w*)/,'$1');
     const token =  request.body.token
-
-    applicationAuthenticate(token, request.configuration, request.mongoose).then(
+    const logger = request.lm.logger
+    applicationAuthenticate(token, request, request.mongoose).then(
         value => {
             request.authentication = value
             next();
         },
         reason => {
-            console.log(reason)
+            logger.error(reason)
             request.authentication = {
             isAuthenticated: false,
             picture: ''
             }
-            next();
+            result.statusCode = 500;
+            response.send('Error Processing Your Request');
+            logger.error('Error Processing the Request:'+  request.originalUrl)
+            logger.error(request.body)
+            logger.error(reason.message)
+            logger.error(reason.stack)
+            return
         }
     )     
 }
@@ -31,13 +37,13 @@ const authorizationManager =  (request, result, next) =>{
     const token=request.body.replace(/token=(\w*)/,'$1');
     //const token = request.body.token
     
-    authenticateAndAddUser(token, request.configuration, request.mongoose).then(
+    authenticateAndAddUser(token, request, request.mongoose).then(
         value => {
             request.authentication = value
             next()
         },
         reason => {
-            console.log(reason)
+            request.lm.logger.error(reason)
             request.authentication = {
             isAuthenticated: false,
             picture: ''
@@ -47,9 +53,9 @@ const authorizationManager =  (request, result, next) =>{
     )     
 }
 
-const authenticateAndAddUser = async (token,configuration,mongoose) => {
+const authenticateAndAddUser = async (token,request,mongoose) => {
 
-    const authentication = await googleAuthenticate(token, configuration,mongoose)
+    const authentication = await googleAuthenticate(token, request.configuration,mongoose)
     if (!authentication.applicationUser) {
         
         authentication.applicationUser  = await addUser(authentication,mongoose)
@@ -59,7 +65,7 @@ const authenticateAndAddUser = async (token,configuration,mongoose) => {
     const userInformation = {
         userId:authentication.applicationUser
     }
-    const applicationJwtToken = await jwtManager.jwtCreate(userInformation)
+    const applicationJwtToken = await jwtManager.jwtCreate(userInformation,request)
     authentication.applicationJwtToken = applicationJwtToken
     
     return authentication
@@ -110,9 +116,9 @@ const googleAuthenticate = async (token,configuration,mongoose) => {
 }
 
 
-const applicationAuthenticate = async (token,configuration,mongoose) => {
+const applicationAuthenticate = async (token,request,mongoose) => {
 
-    const payload = await jwtManager.jwtValidate(token);
+    const payload = await jwtManager.jwtValidate(token,request);
 
     const User = mongoose.model('users');
     //User.findOne({_id: payload.userId})
