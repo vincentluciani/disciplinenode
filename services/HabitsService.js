@@ -71,7 +71,7 @@ const getUserProgressBeforeDate = async (queryObject) => {
   const isoDate = queryObject.progressDate+"T00:00:00.000Z"
 
   result = await progressModel.find({userId:queryObject.userId,progressDateISO:{
-    $lt:isoDate
+    $lt:new Date(isoDate)
   }})
         /*.sort({date:'desc'})
   .lean()*/
@@ -100,7 +100,7 @@ const storeUserProgress = async (progressObject) => {
   const isoDate = progressObject.progressDate+"T00:00:00.000Z"
 
   /* If we find an entry with same user and progress id created after, we do not do anything */
-  result = await progressModel.find({userId:progressObject.userId,progressId:progressObject.progressId,whenUpdated:{$gt:progressObject.whenUpdated}})
+  result = await progressModel.find({userId:progressObject.userId,progressId:progressObject.progressId,whenUpdated:{$gt:new Date(progressObject.whenUpdated)}})
 
   if (result && (result.length > 0)){
     return null
