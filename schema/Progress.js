@@ -75,11 +75,11 @@ const ProgressSchema = new Schema({
       required: false  
     },
     whenUpdated:{
-      type:String,
+      type:Date,
       required: false  
     },
     whenCreated:{
-      type:String,
+      type:Date,
       required: false  
     }
 })
