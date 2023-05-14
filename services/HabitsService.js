@@ -99,11 +99,34 @@ const storeUserProgress = async (progressObject) => {
 
   const isoDate = progressObject.progressDate+"T00:00:00.000Z"
 
-  /* If we find an entry with same user and progress id created after, we do not do anything */
-  result = await progressModel.find({userId:progressObject.userId,progressId:progressObject.progressId,whenUpdated:{$gt:new Date(progressObject.whenUpdated)}})
+  const emptyResult = {
+    ok: true
+  }
+
+  let action = ""
+  /* If we find an entry with same user and progress id not created at the same, we do not do anything 
+  This is the case where the progress on created on a new day on another device */
+  //result = await progressModel.find({userId:progressObject.userId,progressId:progressObject.progressId,whenCreated:{$ne:new Date(progressObject.whenCreated)}})
+
+  /* Looking for another entry with the same habit id and progress date */
+  result = await progressModel.find({userId:progressObject.userId,habitId:progressObject.habitId,progressDate:progressObject.progressDate})
+  
+  let whenNewResultUpdated = new Date(progressObject.whenUpdated)
+  let whenDatabaseResultUpdated = new Date(result[0].whenUpdated)
+  let whenNewResultCreated = new Date(progressObject.whenCreated)
 
   if (result && (result.length > 0)){
-    return null
+    if (whenNewResultUpdated > whenDatabaseResultUpdated){
+      if (whenNewResultUpdated > whenNewResultCreated){
+        action = "update"
+      } else {
+        return emptyResult
+      }
+    } else {
+      return emptyResult
+    }
+  } else {
+    action = "add"
   }
 
   const modifiedProgressObject = {
@@ -111,12 +134,19 @@ const storeUserProgress = async (progressObject) => {
       progressDateISO: isoDate
   }
 
-  var query = {progressId:progressObject.progressId,userId:progressObject.userId},
-  update = modifiedProgressObject,
-  options = { upsert: true, new: true, setDefaultsOnInsert: true };
-
-  result = await progressModel.findOneAndUpdate(query, update, options)
-
+  let query = ""
+  if (action == "update"){
+    query = {userId:progressObject.userId,habitId:progressObject.habitId,progressDate:progressObject.progressDate}
+    options = { upsert: false, new: true, setDefaultsOnInsert: true }
+    result = await progressModel.findOneAndUpdate(query, modifiedProgressObject, options) 
+  } else if (action == "add"){
+    let objectToInsert = new progressModel(modifiedProgressObject)
+    result = await objectToInsert.save(modifiedProgressObject)
+  } else {
+    return emptyResult;
+  }
+  
+  
   return result
 
 }

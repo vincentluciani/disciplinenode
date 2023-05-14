@@ -52,7 +52,7 @@ const ProgressSchema = new Schema({
   },
   weekDay:{
       type:String,
-      required: true  
+      required: false  
     },
     progressDate:{
       type:String,
