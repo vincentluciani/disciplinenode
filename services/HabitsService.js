@@ -110,12 +110,12 @@ const storeUserProgress = async (progressObject) => {
 
   /* Looking for another entry with the same habit id and progress date */
   result = await progressModel.find({userId:progressObject.userId,habitId:progressObject.habitId,progressDate:progressObject.progressDate})
-  
-  let whenNewResultUpdated = new Date(progressObject.whenUpdated)
-  let whenDatabaseResultUpdated = new Date(result[0].whenUpdated)
-  let whenNewResultCreated = new Date(progressObject.whenCreated)
 
   if (result && (result.length > 0)){
+    let whenNewResultUpdated = new Date(progressObject.whenUpdated)
+    let whenDatabaseResultUpdated = new Date(result[0].whenUpdated)
+    let whenNewResultCreated = new Date(progressObject.whenCreated)
+
     if (whenNewResultUpdated > whenDatabaseResultUpdated){
       if (whenNewResultUpdated > whenNewResultCreated){
         action = "update"
