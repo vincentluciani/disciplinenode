@@ -7,9 +7,8 @@ require('./User');
 const verificationManager =  (request, result, next) =>{
 
     //const token=request.body.replace(/token=(\w*)/,'$1');
-    const token =  request.body.token
     const logger = request.lm.logger
-    applicationAuthenticate(token, request, request.mongoose).then(
+    applicationAuthenticate(request, request.mongoose).then(
         value => {
             request.authentication = value
             next();
@@ -116,11 +115,12 @@ const googleAuthenticate = async (token,configuration,mongoose) => {
 }
 
 
-const applicationAuthenticate = async (token,request,mongoose) => {
+const applicationAuthenticate = async (request,mongoose) => {
 
-    const payload = await jwtManager.jwtValidate(token,request);
+    const token =  request.body.token
+    const payload = await jwtManager.jwtValidate(token,request)
 
-    const User = mongoose.model('users');
+    const User = mongoose.model('users')
     //User.findOne({_id: payload.userId})
 
     let user = await User.findOne({_id: payload.userId})
