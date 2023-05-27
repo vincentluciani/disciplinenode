@@ -104,16 +104,14 @@ const storeUserProgress = async (progressObject) => {
   }
 
   let action = ""
-  /* If we find an entry with same user and progress id not created at the same, we do not do anything 
-  This is the case where the progress on created on a new day on another device */
-  //result = await progressModel.find({userId:progressObject.userId,progressId:progressObject.progressId,whenCreated:{$ne:new Date(progressObject.whenCreated)}})
 
   /* Looking for another entry with the same habit id and progress date */
   result = await progressModel.find({userId:progressObject.userId,habitId:progressObject.habitId,progressDate:progressObject.progressDate})
 
   if (result && (result.length > 0)){
     let whenNewResultUpdated = new Date(progressObject.whenUpdated)
-    let whenDatabaseResultUpdated = new Date(result[0].whenUpdated)
+    //let whenDatabaseResultUpdated = new Date(result[0].whenUpdated)
+    let whenDatabaseResultUpdated = result[0].whenUpdated
     let whenNewResultCreated = new Date(progressObject.whenCreated)
 
     if (whenNewResultUpdated > whenDatabaseResultUpdated){
