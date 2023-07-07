@@ -5,7 +5,7 @@ const { query } = require('express');
 const mongoose = require('mongoose')
 const testModel = mongoose.model('test')
 
-const getTest = async (inputObject) => {
+const getTest = async (inputObject,logger) => {
   const date = (new Date()).toString();
   
   var test = new testModel({ name: 'Hello World', dateTime: date });
