@@ -1,9 +1,9 @@
 const callServiceAndAnswer = (serviceFunction,inputObject,response,request) => {
-    serviceFunction(inputObject).
+    serviceFunction(inputObject,request.lm.logger).
     then(value => {
         response.setHeader('Content-Type', 'application/json');
         response.end(JSON.stringify(value));
-        request.lm.logger.info(value);
+        //request.lm.logger.info(value);
         }, reason => {
             response.statusCode = 500;
             response.send('Error Processing Your Request');

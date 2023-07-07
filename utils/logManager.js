@@ -10,7 +10,7 @@ class logManager {
       /* __dirname*/
       exceptionHandlers: [
         new (winston.transports.Console)({ json: false, timestamp: true }),
-        new winston.transports.File({ filename: logDirectory + '/exceptions.log', json: false })
+        new winston.transports.File({ filename: logDirectory + '/exceptions.log', json: false, eol:'\r\n' })
       ],
       format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
       exitOnError: false
