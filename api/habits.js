@@ -17,6 +17,10 @@ router.post('/getall',authenticationManager.verificationManager,(request,respons
   common.callServiceAndAnswer(HabitsService.getAll,{userId:request.authentication.applicationUserId,progressDate:request.body.requestDate},response,request);
 })
 
+router.post('/getalltoday',authenticationManager.verificationManager,(request,response)=>{
+  common.callServiceAndAnswer(HabitsService.getAllToday,{userId:request.authentication.applicationUserId,progressDate:request.body.requestDate},response,request);
+})
+
 router.post('/add',authenticationManager.verificationManager, (request, response)=>{
 
     const habit = {
