@@ -2,7 +2,7 @@
 require('../schema/Habit')
 require('../schema/Progress')
 require('../schema/Journal')
-const {formatDate} = require('../utils/dateFormatting')
+const {formatDate, toDateTime} = require('../utils/dateFormatting')
 const { query } = require('express');
 
 const mongoose = require('mongoose')
@@ -22,8 +22,8 @@ const getAllToday = async (queryObject,logger) => {
 
   resultObject.todaysProgressArray = await getUserProgressForDate(queryObject)
   resultObject.habitsArray =  await habitsModel.find({userId:queryObject.userId})
-  resultObject.todaysProgressArray = await completeTodayProgress(resultObject.todaysProgressArray,resultObject.habitsArray)
-  resultObject.journalArray = await getUserJournalToday(queryObject)
+  resultObject.todaysProgressArray = await completeTodayProgress(resultObject.todaysProgressArray,resultObject.habitsArray,queryObject.progressDateTime)
+  resultObject.journalArray = await getUserJournalToday(queryObject,queryObject.progressDateTime)
   return resultObject
 }
 
@@ -61,20 +61,20 @@ const deleteUserProgress = async (queryObject,logger) => {
 }
 
 const getUserProgressForDate = async (queryObject,logger) => {
-  return await progressModel.find({userId:queryObject.userId,progressDate:queryObject.progressDate})
+  const formattedProgressDate = formatDate(queryObject.progressDateTime)
+  return await progressModel.find({userId:queryObject.userId,progressDate:formattedProgressDate})
       /*.sort({date:'desc'})
 .lean()*/
 }
 
 const getUserJournalForDate = async (queryObject,logger) => {
-  return await journalModel.find({userId:queryObject.userId,journalDate:queryObject.date})
+  return await journalModel.find({userId:queryObject.userId,journalDate:queryObject.requestDate})
       /*.sort({date:'desc'})
 .lean()*/
 }
 
-const getUserJournalToday = async(queryObject,logger) => {
-  var currentDateTime = new Date()
-  var currentDate = formatDate(currentDateTime);
+const getUserJournalToday = async(queryObject,progressDateTime,logger) => {
+  var currentDate = formatDate(progressDateTime);
   return await journalModel.find({userId:queryObject.userId,journalDate:currentDate})
 }
 const getUserJournal = async (queryObject,logger) => {
@@ -85,7 +85,7 @@ const getUserJournal = async (queryObject,logger) => {
 
 
 const getUserProgressBeforeDate = async (queryObject,logger) => {
-  const isoDate = queryObject.progressDate+"T00:00:00.000Z"
+  const isoDate = formatDate(queryObject.progressDateTime)+"T00:00:00.000Z"
 
   result = await progressModel.find({userId:queryObject.userId,progressDateISO:{
     $lt:new Date(isoDate)
@@ -113,7 +113,8 @@ const storeUserJournal = async (journalObject,logger) => {
 }
 const storeUserProgress = async (progressObject,logger) => {
 
-  const isoDate = progressObject.progressDate+"T00:00:00.000Z"
+  //const formattedRequestDate = formatDate(progressObject.progressDateTime)
+  const isoDate = progressObject.progressDate +"T00:00:00.000Z"
 
   const emptyResult = {
     ok: true
@@ -181,10 +182,8 @@ const storeUserProgress = async (progressObject,logger) => {
 
 }
 
-const completeTodayProgress = async (progressArray,habitsArray,currentDate) => {
-  var currentDateTime = new Date()
-  var currentDate = formatDate(currentDateTime);
-
+const completeTodayProgress = async (progressArray,habitsArray,currentDateTime) => {
+  
   let newProgressArray = progressArray
   for (habit of habitsArray){
     let progressExist = false
@@ -194,15 +193,15 @@ const completeTodayProgress = async (progressArray,habitsArray,currentDate) => {
       }
     }
     if (!progressExist && isDayOfWeekInHabitWeeks(currentDateTime,habit.weekDay)){
-      let newProgress = await createProgressBasedOnHabit(habit)
+      let newProgress = await createProgressBasedOnHabit(habit,currentDateTime)
       newProgressArray.push(newProgress)
     }
   }
   return newProgressArray
 }
 
-const createProgressBasedOnHabit = async (habit) => {
-  var currentDateTime = new Date()
+const createProgressBasedOnHabit = async (habit,currentDateTime) => {
+
   var currentDate = formatDate(currentDateTime);
 
   let newProgressObject =  {
@@ -223,9 +222,9 @@ const createProgressBasedOnHabit = async (habit) => {
     progressDate: currentDate,
     numberOfCompletions: 0,
     whatUpdated: "backend createProgressBasedOnHabit",
-    whenUpdated: currentDateTime,
+    whenUpdated: toDateTime(currentDateTime),
     whatCreated: "backend createProgressBasedOnHabit",
-    whenCreated: currentDateTime
+    whenCreated: toDateTime(currentDateTime)
   }
 
   let objectToInsert = new progressModel(newProgressObject)
@@ -235,7 +234,7 @@ const createProgressBasedOnHabit = async (habit) => {
 
 }
 
-var isDayOfWeekInHabitWeeks = function(currentDate, stringOfWeekDays){
+var isDayOfWeekInHabitWeeks = function(currentDateTime, stringOfWeekDays){
 
     var weekDayNumbers = {
       1:'monday',
@@ -246,7 +245,7 @@ var isDayOfWeekInHabitWeeks = function(currentDate, stringOfWeekDays){
       6:'saturday',
       0:'sunday'
   }
-  var currentDayOfWeek = currentDate.getDay();
+  var currentDayOfWeek = currentDateTime.dayOfWeek;
   var currentDayOfWeekString = weekDayNumbers[currentDayOfWeek];
 
   var arrayOfWeekDays = stringOfWeekDays.split(" ");
