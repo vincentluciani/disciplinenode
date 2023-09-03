@@ -12,7 +12,7 @@
                 "<node_internals>/**"
             ],
             "program": "${workspaceFolder}/index.js",
-            "env": {"NODE_ENV": "development"}
+            "env": {"NODE_ENV": "development","TZ":"GMT"}
         }
     ]
 }

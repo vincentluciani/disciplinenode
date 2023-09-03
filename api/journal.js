@@ -5,7 +5,7 @@ const common = require('../utils/requestManager')
 const authenticationManager = require('../utils/authenticationManager.js')
 
 router.post('/get',authenticationManager.verificationManager,(request,response)=>{
-    common.callServiceAndAnswer(HabitsService.getUserJournalForDate,{userId:request.authentication.applicationUserId,date:request.body.requestDate},response,request);
+    common.callServiceAndAnswer(HabitsService.getUserJournalForDate,{userId:request.authentication.applicationUserId,requestDate:request.body.requestDate},response,request);
 })  
 
 router.post('/add',authenticationManager.verificationManager,  function(request, response){
