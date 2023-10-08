@@ -10,10 +10,20 @@ const authenticationManager = require('./authenticationManager.js')
 router.post('/',postReceiver, authenticationManager.authorizationManager, function(request, response){
         /* todo put final handling in a middleware */
         if (request.authentication.isAuthenticated){
+            response.cookie('authToken', request.authentication.applicationJwtToken, {
+                 httpOnly: true,
+                 secure: true,
+                sameSite: true });
+            response.cookie('refreshToken', request.authentication.applicationRefreshToken, {
+                httpOnly: true,
+                secure: true,
+                sameSite: true });            
             response.writeHead(200, {'Content-Type': 'text/html'})
             /* todo: should return our own token */
             response.end(JSON.stringify({
-                applicationJwtToken: request.authentication.applicationJwtToken,
+                authenticated: true,
+                tokenExpiry: request.authentication.tokenExpiry,
+                refreshTokenExpiry: request.authentication.refreshTokenExpiry,
                 picture:request.authentication.picture,
                 familyName:request.authentication.familyName,
                 givenName:request.authentication.givenName
@@ -24,7 +34,33 @@ router.post('/',postReceiver, authenticationManager.authorizationManager, functi
         }
     })
 
-
+    router.post('/refresh',postReceiver, authenticationManager.refreshManager, function(request, response){
+        /* todo put final handling in a middleware */
+        if (request.authentication.isAuthenticated){
+            response.cookie('authToken', request.authentication.applicationJwtToken, {
+                 httpOnly: true,
+                 secure: true,
+                sameSite: true });
+            response.cookie('refreshToken', request.authentication.applicationRefreshToken, {
+                httpOnly: true,
+                secure: true,
+                sameSite: true });            
+            response.writeHead(200, {'Content-Type': 'text/html'})
+            /* todo: should return our own token */
+            response.end(JSON.stringify({
+                /*applicationJwtToken: request.authentication.applicationJwtToken,*/
+                authenticated: true,
+                tokenExpiry: request.authentication.tokenExpiry,
+                refreshTokenExpiry: request.authentication.refreshTokenExpiry,
+                picture:request.authentication.picture,
+                familyName:request.authentication.familyName,
+                givenName:request.authentication.givenName
+            }))
+        } else {
+            response.writeHead(401, {'Content-Type': 'text/html'})
+            response.end("Authentication Failed")
+        }
+    })
     
     router.post('/testcreatetoken',postReceiver, function(request, response){
         /* todo put final handling in a middleware */

@@ -11,6 +11,7 @@ const authenticationManager = require('../utils/authenticationManager.js')
 const authRouter= require('./auth');
 
 const app = express();
+const cookieParser = require('cookie-parser');
 const http = require('http');
 const https = require('https');
 const options = {}
@@ -70,6 +71,9 @@ const initializeServer = (routers,protocol) => {
     // Parse JSON bodies (as sent by API clients)
     app.use(express.json());
     app.use(compression())
+
+    // Use cookie-parser middleware to parse cookies
+    app.use(cookieParser());
 
     // Global variables
     app.use(function(req,res,next){
