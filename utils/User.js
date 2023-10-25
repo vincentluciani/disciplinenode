@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
   userGoogleId:{
-    type:Number,
+    type:String,
     required: true  
   },
   userType:{

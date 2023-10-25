@@ -1,5 +1,5 @@
 const callServiceAndAnswer = (serviceFunction,inputObject,response,request) => {
-    serviceFunction(inputObject,request.lm.logger).
+    serviceFunction(inputObject,request.lm.logger,request.configuration['cypheringKey']).
     then(value => {
         response.setHeader('Content-Type', 'application/json');
         response.end(JSON.stringify(value));

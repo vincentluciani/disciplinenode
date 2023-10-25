@@ -17,7 +17,8 @@ router.post('/',postReceiver, authenticationManager.authorizationManager, functi
             response.cookie('refreshToken', request.authentication.applicationRefreshToken, {
                 httpOnly: true,
                 secure: true,
-                sameSite: true });            
+                sameSite: true,
+                expires: request.authentication.refreshTokenExpiry });            
             response.writeHead(200, {'Content-Type': 'text/html'})
             /* todo: should return our own token */
             response.end(JSON.stringify({
@@ -44,7 +45,8 @@ router.post('/',postReceiver, authenticationManager.authorizationManager, functi
             response.cookie('refreshToken', request.authentication.applicationRefreshToken, {
                 httpOnly: true,
                 secure: true,
-                sameSite: true });            
+                sameSite: true,
+                expires: request.authentication.refreshTokenExpiry });            
             response.writeHead(200, {'Content-Type': 'text/html'})
             /* todo: should return our own token */
             response.end(JSON.stringify({

@@ -4,6 +4,7 @@ require('../schema/Progress')
 require('../schema/Journal')
 const {formatDate, toDateTime} = require('../utils/dateFormatting')
 const { query } = require('express');
+const {cypherText,decypherText} = require('../utils/cypheringManager')
 
 const mongoose = require('mongoose')
 const habitsModel = mongoose.model('habits')
@@ -17,24 +18,34 @@ const getUserHabits = async (queryObject) => {
 .lean()*/
 }
 
-const getAllToday = async (queryObject,logger) => {
+const getAllToday = async (queryObject,logger,cypheringKey) => {
   var resultObject = {}
 
-  resultObject.todaysProgressArray = await getUserProgressForDate(queryObject)
-  resultObject.habitsArray =  await habitsModel.find({userId:queryObject.userId})
-  resultObject.todaysProgressArray = await completeTodayProgress(resultObject.todaysProgressArray,resultObject.habitsArray,queryObject.progressDateTime)
-  resultObject.journalArray = await getUserJournalToday(queryObject,queryObject.progressDateTime)
+  resultObject.todaysProgressArray = await getUserProgressForDate(queryObject,cypheringKey)
+  resultObject.habitsArray =  await getHabitsArray(queryObject.userId,cypheringKey)
+  resultObject.todaysProgressArray = await completeTodayProgress(resultObject.todaysProgressArray,resultObject.habitsArray,queryObject.progressDateTime,cypheringKey)
+  resultObject.journalArray = await getUserJournalToday(queryObject,queryObject.progressDateTime,cypheringKey)
   return resultObject
 }
+const getHabitsArray = async (id,cypheringKey) =>{
 
-const getAll = async (queryObject,logger) => {
+  let habitsArray = await habitsModel.find({userId:id})
+
+  for (let habitElement of habitsArray){
+    habitElement.habitDescription = decypherText(habitElement.habitDescription,cypheringKey)
+  }
+
+  return habitsArray
+}
+
+const getAll = async (queryObject,logger,cypheringKey) => {
   var resultObject = {}
 
-  resultObject.journalArray = await getUserJournal(queryObject)
+  resultObject.journalArray = await getUserJournal(queryObject,cypheringKey)
   // resultObject.progressArray=await getAllUserProgress(queryObject)
   // resultObject.todaysProgressArray = await getUserProgressForDate(queryObject)
   // // resultObject.habitsArray =  await habitsModel.find({userId:queryObject.userId})
-  resultObject.pastProgressArray = await getUserProgressBeforeDate(queryObject)
+  resultObject.pastProgressArray = await getUserProgressBeforeDate(queryObject,cypheringKey)
 
 
   return resultObject
@@ -60,46 +71,67 @@ const deleteUserProgress = async (queryObject,logger) => {
   /* check if what is returned is what was given */
 }
 
-const getUserProgressForDate = async (queryObject,logger) => {
+const getUserProgressForDate = async (queryObject,cypheringKey,logger) => {
   const formattedProgressDate = formatDate(queryObject.progressDateTime)
-  return await progressModel.find({userId:queryObject.userId,progressDate:formattedProgressDate})
+  let userProgressArray = await progressModel.find({userId:queryObject.userId,progressDate:formattedProgressDate})
+  for (let progressElement of userProgressArray){
+    progressElement.habitDescription = decypherText(progressElement.habitDescription,cypheringKey)
+  }
+  return userProgressArray
       /*.sort({date:'desc'})
 .lean()*/
 }
 
-const getUserJournalForDate = async (queryObject,logger) => {
-  return await journalModel.find({userId:queryObject.userId,journalDate:queryObject.requestDate})
-      /*.sort({date:'desc'})
+const getUserJournalForDate = async (queryObject,logger,cypheringKey) => {
+  let journalArray = await journalModel.find({userId:queryObject.userId,journalDate:queryObject.requestDate})
+  for (let journalElement of journalArray){
+    journalElement.text = decypherText(journalElement.text,cypheringKey)
+  }
+  return journalArray
+  /*.sort({date:'desc'})
 .lean()*/
 }
 
-const getUserJournalToday = async(queryObject,progressDateTime,logger) => {
+const getUserJournalToday = async(queryObject,progressDateTime,cypheringKey,logger) => {
   var currentDate = formatDate(progressDateTime);
-  return await journalModel.find({userId:queryObject.userId,journalDate:currentDate})
+  let journalArray = await journalModel.find({userId:queryObject.userId,journalDate:currentDate})
+  for (let journalElement of journalArray){
+    journalElement.text = decypherText(journalElement.text,cypheringKey)
+  }
+  return journalArray
 }
-const getUserJournal = async (queryObject,logger) => {
-  return await journalModel.find({userId:queryObject.userId})
+const getUserJournal = async (queryObject,cypheringKey,logger) => {
+  let journalArray = await journalModel.find({userId:queryObject.userId})
+  for (let journalElement of journalArray){
+      journalElement.text = decypherText(journalElement.text,cypheringKey)
+  }
+  return journalArray
       /*.sort({date:'desc'})
 .lean()*/
 }
 
 
-const getUserProgressBeforeDate = async (queryObject,logger) => {
+const getUserProgressBeforeDate = async (queryObject,cypheringKey,logger) => {
   const isoDate = formatDate(queryObject.progressDateTime)+"T00:00:00.000Z"
 
-  result = await progressModel.find({userId:queryObject.userId,progressDateISO:{
+  let progressArray = await progressModel.find({userId:queryObject.userId,progressDateISO:{
     $lt:new Date(isoDate)
   }}).sort({progressDateISO:-1})
         /*.sort({date:'desc'})
   .lean()*/
+  for (let progressElement of progressArray){
+    progressElement.habitDescription = decypherText(progressElement.habitDescription,cypheringKey)
+  }
+  return progressArray
 
-  return result;
+  //return result;
 }
 
-const getAllUserProgress = async (queryObject,logger) => {
-  return await progressModel.find({userId:queryObject.userId})
-/*.lean()*/
-}
+// const getAllUserProgress = async (queryObject,logger,cypheringKey) => {
+//   return await progressModel.find({userId:queryObject.userId})
+  
+// /*.lean()*/
+// }
 
 const storeUserJournal = async (journalObject,logger) => {
 
@@ -182,7 +214,7 @@ const storeUserProgress = async (progressObject,logger) => {
 
 }
 
-const completeTodayProgress = async (progressArray,habitsArray,currentDateTime) => {
+const completeTodayProgress = async (progressArray,habitsArray,currentDateTime,cypheringKey) => {
   
   let newProgressArray = progressArray
   for (habit of habitsArray){
@@ -193,22 +225,23 @@ const completeTodayProgress = async (progressArray,habitsArray,currentDateTime) 
       }
     }
     if (!progressExist && isDayOfWeekInHabitWeeks(currentDateTime,habit.weekDay)){
-      let newProgress = await createProgressBasedOnHabit(habit,currentDateTime)
+      let newProgress = await createProgressBasedOnHabit(habit,currentDateTime,cypheringKey)
       newProgressArray.push(newProgress)
     }
   }
   return newProgressArray
 }
 
-const createProgressBasedOnHabit = async (habit,currentDateTime) => {
+const createProgressBasedOnHabit = async (habit,currentDateTime,cypheringKey) => {
 
   var currentDate = formatDate(currentDateTime);
+  const encryptedHabitDescription = cypherText(habit.habitDescription,cypheringKey)
 
   let newProgressObject =  {
     progressId: habit.habitId + "_" + currentDate,
     habitId: habit.habitId,
     userId: habit.userId,
-    habitDescription: habit.habitDescription,
+    habitDescription: encryptedHabitDescription,
     isCritical: habit.isCritical?habit.isCritical:false,
     isSuspendableDuringOtherCases: habit.isSuspendableDuringOtherCases?habit.isSuspendableDuringOtherCases:false,
     isSuspendableDuringSickness: habit.isSuspendableDuringSickness?habit.isSuspendableDuringSickness:false,
@@ -230,6 +263,7 @@ const createProgressBasedOnHabit = async (habit,currentDateTime) => {
   let objectToInsert = new progressModel(newProgressObject)
   result = await objectToInsert.save(objectToInsert)
 
+  newProgressObject.habitDescription = habit.habitDescription
   return newProgressObject
 
 }

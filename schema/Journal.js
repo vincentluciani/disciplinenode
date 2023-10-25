@@ -20,4 +20,6 @@ const JournalSchema = new Schema({
   }
 })
 
+JournalSchema.index({ userId: 1, journalDate: 1 }, { unique: true })
+
 mongoose.model('journal',JournalSchema);
