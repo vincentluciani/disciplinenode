@@ -3,6 +3,7 @@ const router = express.Router()
 const HabitsService = require('../services/HabitsService')
 const common = require('../utils/requestManager')
 const authenticationManager = require('../utils/authenticationManager.js')
+const {cypherText,decypherText} = require('../utils/cypheringManager')
 
 router.post('/get',authenticationManager.verificationManager,(request,response)=>{
   common.callServiceAndAnswer(HabitsService.getUserHabits,{userId:request.authentication.applicationUserId},response,request);
@@ -23,10 +24,12 @@ router.post('/getalltoday',authenticationManager.verificationManager,(request,re
 
 router.post('/add',authenticationManager.verificationManager, (request, response)=>{
 
+    const encryptedHabitDescription = cypherText(request.body.habitDescription,request.configuration['cypheringKey'])
+
     const habit = {
         userId: request.authentication.applicationUserId,
         habitId: request.body.habitId,
-        habitDescription: request.body.habitDescription,
+        habitDescription: encryptedHabitDescription,
         weekDay: request.body.weekDay,
         isCritical: request.body.isCritical,
         isSuspendableDuringOtherCases: request.body.isSuspendableDuringOtherCases,

@@ -1,4 +1,5 @@
 const jwtManager = require('./jwtManager.js')
+const {hashText} = require('./cypheringManager')
 
 const {OAuth2Client} = require('google-auth-library');
 require('./User');
@@ -79,19 +80,27 @@ const authenticateAndAddUser = async (token,request,mongoose) => {
 }
 
 const addUser = async (authentication,mongoose) => {
-    
     const User = mongoose.model('users');
     const newUser = {
         userGoogleId: authentication.googleUserId,
         userType: 'google'
-    }
-    new User(newUser).save()
-    .then(
-        (savedUser) => {
-            user = savedUser
-            return user.id
-        }
-    );
+      };
+    
+      try {
+        const savedUser = await new User(newUser).save();
+        return savedUser.id;
+      } catch (error) {
+        console.error(error);
+        throw error; // You may choose to handle the error differently
+      }
+    
+    // new User(newUser).save()
+    // .then(
+    //     (savedUser) => {
+    //         user = savedUser
+    //         return user.id
+    //     }
+    // );
     
 }
 
@@ -102,7 +111,7 @@ const googleAuthenticate = async (token,configuration,mongoose) => {
     let authentication = {
         isAuthenticated: true,
         picture: payload.picture,
-        googleUserId: payload.sub,
+        googleUserId: hashText(payload.sub.toString()),
         email: payload.email,
         familyName: payload.family_name,
         givenName: payload.given_name
