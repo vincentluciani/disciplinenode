@@ -2,6 +2,8 @@
 require('../schema/Habit')
 require('../schema/Progress')
 require('../schema/Journal')
+require('../utils/User')
+
 const {formatDate, toDateTime} = require('../utils/dateFormatting')
 const { query } = require('express');
 const {cypherText,decypherText} = require('../utils/cypheringManager')
@@ -11,6 +13,8 @@ const habitsModel = mongoose.model('habits')
 
 const progressModel = mongoose.model('progress')
 const journalModel = mongoose.model('journal')
+
+const userModel = mongoose.model('users')
 
 const getUserHabits = async (queryObject) => {
   return await habitsModel.find({userId:queryObject.userId})
@@ -70,6 +74,27 @@ const deleteUserProgress = async (queryObject,logger) => {
   return await progressModel.deleteOne({progressId:queryObject.id,userId:queryObject.userId})
   /* check if what is returned is what was given */
 }
+
+const deleteProgresses = async (queryObject,logger) => {
+  return await progressModel.deleteMany({userId:queryObject.userId})
+  /* check if what is returned is what was given */
+}
+const deleteHabits = async (queryObject,logger) => {
+  return await habitsModel.deleteMany({userId:queryObject.userId})
+  /* check if what is returned is what was given */
+}
+
+const deleteUser = async (queryObject,logger) => {
+  return await userModel.deleteOne({_id:queryObject.userId})
+  /* check if what is returned is what was given */
+} 
+
+const deleteFullAccount = async (queryObject,logger) => {
+  var result = await deleteProgresses(queryObject,logger)
+  result = await deleteHabits(queryObject,logger)
+  return result = await deleteUser(queryObject,logger)
+}
+
 
 const getUserProgressForDate = async (queryObject,cypheringKey,logger) => {
   const formattedProgressDate = formatDate(queryObject.progressDateTime)
@@ -298,5 +323,6 @@ module.exports = {
   getAll: getAll,
   storeUserProgress: storeUserProgress,
   storeUserJournal: storeUserJournal,
-  getUserJournalForDate: getUserJournalForDate
+  getUserJournalForDate: getUserJournalForDate,
+  deleteFullAccount
 }

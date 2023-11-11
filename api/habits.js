@@ -48,4 +48,8 @@ router.post('/add',authenticationManager.verificationManager, (request, response
 
 });
 
+router.post('/deleteaccount',authenticationManager.verificationManager,(request,response)=>{
+  common.callServiceAndAnswer(HabitsService.deleteFullAccount,{userId:request.authentication.applicationUserId,progressDateTime:request.body.requestDateTime},response,request);
+});
+
 module.exports = router;
