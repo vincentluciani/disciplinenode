@@ -7,7 +7,7 @@ const jwtCreate = async (userData,request) =>{
     var jwtOptions = {
         // audience :  ["http://localhost:3000","https://brainstrive","https://www.brainstrive.com"],
          issuer : "https://www.vince.com",
-         expiresIn : '10m',
+         expiresIn : '15m',
          //iat : nowSeconds
        };
 
