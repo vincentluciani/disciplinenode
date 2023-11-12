@@ -7,7 +7,7 @@ const jwtCreate = async (userData,request) =>{
     var jwtOptions = {
         // audience :  ["http://localhost:3000","https://brainstrive","https://www.brainstrive.com"],
          issuer : "https://www.vince.com",
-         expiresIn : '15m',
+         expiresIn : '40m',
          //iat : nowSeconds
        };
 
@@ -16,7 +16,7 @@ const jwtCreate = async (userData,request) =>{
 
 
     const now = new Date(); // Get the current date and time
-    now.setMinutes(now.getMinutes() + 10); // Add 10 minutes
+    now.setMinutes(now.getMinutes() + 30); // Add 10 minutes
 
     authentication.expiration = now
 
@@ -28,7 +28,7 @@ const jwtCreate = async (userData,request) =>{
     let authentication = {}
     const refreshJwtOptions = {
         issuer: 'https://www.vince.com',
-        expiresIn: '30d', // Set a longer expiration time for the refresh token (e.g., 30 days)
+        expiresIn: '6d', // Set a longer expiration time for the refresh token (e.g., 30 days)
       };
     // Generate a secure refresh token (you should use a secure library for this)
     //const refreshToken = crypto.randomBytes(32).toString('hex');
@@ -40,7 +40,7 @@ const jwtCreate = async (userData,request) =>{
     const currentDate = new Date();
     
     // Add one day (24 hours) to the current date
-    currentDate.setDate(currentDate.getDate() + 30)
+    currentDate.setDate(currentDate.getDate() + 6)
 
     authentication.expiration = currentDate
 
