@@ -9,6 +9,7 @@ const mongoStoreFactory = require('connect-mongo');
 const postReceiver = require('../utils/postReceiver.js')
 const authenticationManager = require('../utils/authenticationManager.js')
 const authRouter= require('./auth');
+const versionRouter = require('./version')
 
 const app = express();
 const cookieParser = require('cookie-parser');
@@ -88,6 +89,8 @@ const initializeServer = (routers,protocol) => {
     })
 
     app.use('/auth',authRouter);
+
+    app.use('/version',versionRouter);
 
     httpServer.listen(port,() => {
         console.log(`Server started on port ${port}`);
