@@ -2,6 +2,7 @@ const callServiceAndAnswer = (serviceFunction,inputObject,response,request) => {
     serviceFunction(inputObject,request.lm.logger,request.configuration['cypheringKey']).
     then(value => {
         response.setHeader('Content-Type', 'application/json');
+        /*response.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');*/
         response.end(JSON.stringify(value));
         //request.lm.logger.info(value);
         }, reason => {

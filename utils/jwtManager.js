@@ -6,7 +6,7 @@ const jwtCreate = async (userData,request) =>{
     let authentication = {}
     var jwtOptions = {
         // audience :  ["http://localhost:3000","https://brainstrive","https://www.brainstrive.com"],
-         issuer : "https://www.vince.com",
+         issuer : "https://www.vincent-luciani.com",
          expiresIn : '40m',
          //iat : nowSeconds
        };
@@ -27,7 +27,7 @@ const jwtCreate = async (userData,request) =>{
   const generateRefreshToken = async (userData,request) => {
     let authentication = {}
     const refreshJwtOptions = {
-        issuer: 'https://www.vince.com',
+        issuer: 'https://www.vincent-luciani.com',
         expiresIn: '6d', // Set a longer expiration time for the refresh token (e.g., 30 days)
       };
     // Generate a secure refresh token (you should use a secure library for this)
@@ -52,7 +52,7 @@ const jwtValidate = async (token,request) =>{
 // jwt.verify(token, global.config.secretKey
     var jwtOptions = {
         // audience :  ["http://localhost:3000","https://brainstrive","https://www.brainstrive.com"],
-        issuer : "https://www.vince.com",
+        issuer : "https://www.vincent-luciani.com",
         expiresIn : '1d'
         //iat : nowSeconds
     };

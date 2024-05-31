@@ -23,8 +23,7 @@ const routers = [
     }
 ]
 
-nodeMongo.initializeServer(routers,'https')
-
+nodeMongo.initializeServer(routers)
 
 
 

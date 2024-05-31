@@ -138,9 +138,12 @@ const getUserJournal = async (queryObject,cypheringKey,logger) => {
 
 const getUserProgressBeforeDate = async (queryObject,cypheringKey,logger) => {
   const isoDate = formatDate(queryObject.progressDateTime)+"T00:00:00.000Z"
+  const oldDate = new Date();
+  oldDate.setDate(oldDate.getDate() - 11);
 
   let progressArray = await progressModel.find({userId:queryObject.userId,progressDateISO:{
-    $lt:new Date(isoDate)
+    $lt:new Date(isoDate),
+    $gte: oldDate,
   }}).sort({progressDateISO:-1})
         /*.sort({date:'desc'})
   .lean()*/

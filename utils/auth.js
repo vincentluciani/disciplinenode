@@ -10,14 +10,9 @@ const authenticationManager = require('./authenticationManager.js')
 router.post('/',postReceiver, authenticationManager.authorizationManager, function(request, response){
         /* todo put final handling in a middleware */
         if (request.authentication.isAuthenticated){
-            response.cookie('authToken', request.authentication.applicationJwtToken, {
-                 httpOnly: true,
-                 secure: true,
-                sameSite: true });
+            response.cookie('authToken', request.authentication.applicationJwtToken, request.cookieOptions);
             response.cookie('refreshToken', request.authentication.applicationRefreshToken, {
-                httpOnly: true,
-                secure: true,
-                sameSite: true,
+                ...request.cookieOptions,
                 expires: request.authentication.refreshTokenExpiry });            
             response.writeHead(200, {'Content-Type': 'text/html'})
             /* todo: should return our own token */
@@ -38,14 +33,9 @@ router.post('/',postReceiver, authenticationManager.authorizationManager, functi
     router.post('/refresh',postReceiver, authenticationManager.refreshManager, function(request, response){
         /* todo put final handling in a middleware */
         if (request.authentication.isAuthenticated){
-            response.cookie('authToken', request.authentication.applicationJwtToken, {
-                 httpOnly: true,
-                 secure: true,
-                sameSite: true });
+            response.cookie('authToken', request.authentication.applicationJwtToken, request.cookieOptions,);
             response.cookie('refreshToken', request.authentication.applicationRefreshToken, {
-                httpOnly: true,
-                secure: true,
-                sameSite: true,
+                ...request.cookieOptions,
                 expires: request.authentication.refreshTokenExpiry });            
             response.writeHead(200, {'Content-Type': 'text/html'})
             /* todo: should return our own token */
