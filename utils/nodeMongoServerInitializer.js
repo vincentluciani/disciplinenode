@@ -10,6 +10,7 @@ const postReceiver = require('../utils/postReceiver.js')
 const authenticationManager = require('../utils/authenticationManager.js')
 const authRouter= require('./auth');
 const versionRouter = require('./version')
+const cors = require('cors');
 
 const app = express();
 const cookieParser = require('cookie-parser');
@@ -17,7 +18,7 @@ const http = require('http');
 const https = require('https');
 const options = {}
 
-const initializeServer = (routers,protocol) => {
+const initializeServer = routers => {
 
     const configuration = configManager.getApplicationConfiguration();
 
@@ -34,8 +35,21 @@ const initializeServer = (routers,protocol) => {
 
     let httpServer
 
-    if (protocol === 'http'){       
+    if (null!=configuration.pwaTest && configuration.pwaTest == 'true'){       
         httpServer = http.createServer(options,app);
+
+        app.use(cors({
+            origin: configuration.pwaTestURL, // Allow requests from this origin
+            credentials: true // Allow credentials (cookies) to be sent
+          }));
+        app.use(function(req, res, next) {
+            res.header('Referrer-Policy', 'unsafe-url');
+            res.header("Access-Control-Allow-Origin", configuration.pwaTestURL);
+            res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+            res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+            res.header("Access-Control-Allow-Credentials", 'true');
+            next();
+        });
     } else {
         var key = configuration.privateKey;
         var cert = configuration.certificate;
