@@ -109,10 +109,16 @@ const getUserProgressForDate = async (queryObject,cypheringKey,logger) => {
 
 const getUserJournalForDate = async (queryObject,logger,cypheringKey) => {
   let journalArray = await journalModel.find({userId:queryObject.userId,journalDate:queryObject.requestDate})
-  for (let journalElement of journalArray){
-    journalElement.text = decypherText(journalElement.text,cypheringKey)
+  // for (let journalElement of journalArray){
+  //   journalElement.text = decypherText(journalElement.text,cypheringKey)
+  // }
+  if (null!=journalArray && journalArray.length>=1){
+    return journalArray[0]
+  } else {
+    return {}
   }
-  return journalArray
+
+  return journalArray[0]
   /*.sort({date:'desc'})
 .lean()*/
 }
@@ -120,10 +126,15 @@ const getUserJournalForDate = async (queryObject,logger,cypheringKey) => {
 const getUserJournalToday = async(queryObject,progressDateTime,cypheringKey,logger) => {
   var currentDate = formatDate(progressDateTime);
   let journalArray = await journalModel.find({userId:queryObject.userId,journalDate:currentDate})
-  for (let journalElement of journalArray){
-    journalElement.text = decypherText(journalElement.text,cypheringKey)
+  if (null!=journalArray && journalArray.length>=1){
+    return journalArray[0]
+  } else {
+    return {}
   }
-  return journalArray
+  // for (let journalElement of journalArray){
+  //   journalElement.text = decypherText(journalElement.text,cypheringKey)
+  // }
+  // return journalArray[0]
 }
 const getUserJournal = async (queryObject,cypheringKey,logger) => {
   let journalArray = await journalModel.find({userId:queryObject.userId})
