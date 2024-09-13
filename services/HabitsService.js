@@ -118,7 +118,7 @@ const getUserJournalForDate = async (queryObject,logger,cypheringKey) => {
     return {}
   }
 
-  return journalArray[0]
+  //return journalArray[0]
   /*.sort({date:'desc'})
 .lean()*/
 }
