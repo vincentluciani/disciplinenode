@@ -27,7 +27,13 @@ const getAllToday = async (queryObject,logger,cypheringKey) => {
 
   resultObject.todaysProgressArray = await getUserProgressForDate(queryObject,cypheringKey)
   resultObject.habitsArray =  await getHabitsArray(queryObject.userId,cypheringKey)
+  /* completeTodayProgress can fail in case another instance of the client sends the request at the exact same time
+  In that case, you need to get the progresses again to get the processes created successfully by the other client */
+  try {
   resultObject.todaysProgressArray = await completeTodayProgress(resultObject.todaysProgressArray,resultObject.habitsArray,queryObject.progressDateTime,cypheringKey)
+  } catch(e){
+    resultObject.todaysProgressArray = await getUserProgressForDate(queryObject,cypheringKey)
+  }
   resultObject.journalArray = await getUserJournalToday(queryObject,queryObject.progressDateTime,cypheringKey)
   return resultObject
 }
@@ -113,6 +119,7 @@ const getUserJournalForDate = async (queryObject,logger,cypheringKey) => {
   //   journalElement.text = decypherText(journalElement.text,cypheringKey)
   // }
   if (null!=journalArray && journalArray.length>=1){
+    journalArray[0].text = decypherText(journalArray[0].text,cypheringKey)
     return journalArray[0]
   } else {
     return {}
@@ -127,6 +134,7 @@ const getUserJournalToday = async(queryObject,progressDateTime,cypheringKey,logg
   var currentDate = formatDate(progressDateTime);
   let journalArray = await journalModel.find({userId:queryObject.userId,journalDate:currentDate})
   if (null!=journalArray && journalArray.length>=1){
+    journalArray[0].text = decypherText(journalArray[0].text,cypheringKey)
     return journalArray[0]
   } else {
     return {}
@@ -278,7 +286,7 @@ const createProgressBasedOnHabit = async (habit,currentDateTime,cypheringKey) =>
 
   let newProgressObject =  {
     progressId: habit.habitId + "_" + currentDate,
-    habitId: habit.habitId,
+    habitId: habit.habitId.toString(),
     userId: habit.userId,
     habitDescription: encryptedHabitDescription,
     isCritical: habit.isCritical?habit.isCritical:false,
@@ -300,7 +308,8 @@ const createProgressBasedOnHabit = async (habit,currentDateTime,cypheringKey) =>
   }
 
   let objectToInsert = new progressModel(newProgressObject)
-  result = await objectToInsert.save(objectToInsert)
+  //result = await objectToInsert.save(objectToInsert)
+  result = await objectToInsert.save()
 
   newProgressObject.habitDescription = habit.habitDescription
   return newProgressObject
