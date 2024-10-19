@@ -21,9 +21,9 @@ const verificationManager =  (request, result, next) =>{
             isAuthenticated: false,
             picture: ''
             }
-            result.statusCode = 500;
-            response.send('Error Processing Your Request');
-            logger.error('Error Processing the Request:'+  request.originalUrl)
+            result.statusCode = 401;
+            response.send('Error Authenticating Your Request');
+            logger.error('Error Authenticating the Request in verificationManager:'+  request.originalUrl)
             logger.error(request.body)
             logger.error(reason.message)
             logger.error(reason.stack)
@@ -137,6 +137,11 @@ const applicationAuthenticate = async (token,request) => {
     
     const payload = await jwtManager.jwtValidate(token,request)
 
+    if (null==payload){
+        return {
+            isAuthenticated: false
+        }
+    }
     const User = request.mongoose.model('users')
     //User.findOne({_id: payload.userId})
 
