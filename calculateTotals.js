@@ -8,7 +8,7 @@ require('./schema/Progress');
 const BATCH_SIZE = 1000;
 
   
-
+/* to run in prod: NODE_ENV=production node calculateTotals.js  */
 
 async function fetchUserBatch(usersModel, lastUserId) {
   const query = lastUserId ? { _id: { $gt: lastUserId } } : {};
@@ -313,6 +313,10 @@ mongoose.connect(configuration.database,{ useNewUrlParser: true, useUnifiedTopol
         processUsersInBatches(mongoose);
     }
     )
+    .then(()=>{
+        console.log('process ended')
+        process.exit(1);
+    })
 .catch(err => console.log(err));
 
 
