@@ -7,11 +7,21 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Program",
+            "name": "Web server",
             "skipFiles": [
                 "<node_internals>/**"
             ],
             "program": "${workspaceFolder}/index.js",
+            "env": {"NODE_ENV": "development","TZ":"GMT"}
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "batch",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/calculateTotals.js",
             "env": {"NODE_ENV": "development","TZ":"GMT"}
         }
     ]
