@@ -2,7 +2,9 @@
 require('../schema/Habit')
 require('../schema/Progress')
 require('../schema/Journal')
+require('../schema/UserCount')
 require('../utils/User')
+
 
 const {formatDate, toDateTime} = require('../utils/dateFormatting')
 const { query } = require('express');
@@ -15,6 +17,8 @@ const progressModel = mongoose.model('progress')
 const journalModel = mongoose.model('journal')
 
 const userModel = mongoose.model('users')
+
+const userCountModel = mongoose.model('usercounts')
 
 const getUserHabits = async (queryObject) => {
   return await habitsModel.find({userId:queryObject.userId})
@@ -35,6 +39,8 @@ const getAllToday = async (queryObject,logger,cypheringKey) => {
     resultObject.todaysProgressArray = await getUserProgressForDate(queryObject,cypheringKey)
   }
   resultObject.journalArray = await getUserJournalToday(queryObject,queryObject.progressDateTime,cypheringKey)
+  resultObject.counts = await getUserCounts(queryObject)
+  
   return resultObject
 }
 const getHabitsArray = async (id,cypheringKey) =>{
@@ -109,6 +115,22 @@ const getUserProgressForDate = async (queryObject,cypheringKey,logger) => {
     progressElement.habitDescription = decypherText(progressElement.habitDescription,cypheringKey)
   }
   return userProgressArray
+      /*.sort({date:'desc'})
+.lean()*/
+}
+
+const getUserCounts = async (queryObject,logger) => {
+  let userCountObjectArray = await userCountModel.find({userId:queryObject.userId})
+
+  if (null != userCountObjectArray && userCountObjectArray.length > 0){
+    return {
+      daysWithAllTargetsMet: userCountObjectArray[0].daysWithAllTargetsMet.count,
+      xpCounting: userCountObjectArray[0].xpCounting.count
+    }
+  } else {
+    return {}
+  }
+  
       /*.sort({date:'desc'})
 .lean()*/
 }
