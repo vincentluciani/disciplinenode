@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 const logManager = require('./utils/logManager.js');
 const configManager = require('./utils/configManager.js')
 require('./utils/User');
-require('./schema/Progress')
+require('./schema/UserCount.js');
+require('./schema/Progress');
 // Batch size for processing users
 const BATCH_SIZE = 1000;
 
@@ -62,9 +63,9 @@ async function calculateDaysWithAllTargetsMetAndLastDate(
 
   // Extract the number of days and the last date processed
   const daysWithAllTargetsMet = result.length;
-  const lastProcessedDate = result.length > 0 ? result[result.length - 1]._id : countingLastDay;
+  const lastProcessedDateFullDays = result.length > 0 ? result[result.length - 1]._id : countingLastDay;
 
-  return { daysWithAllTargetsMet, lastProcessedDate };
+  return { daysWithAllTargetsMet, lastProcessedDateFullDays };
 }
 
 async function calculateNumberOfXPAndLastDate(
@@ -177,14 +178,20 @@ async function calculateMonthlyAchievementsPerHabit(habitsCollection, userId, la
  * @param {Collection} usersCollection - The MongoDB users collection
  * @param {Object} user - The user document
  */
-async function processUser(progressModel, usersModel, user) {
+async function processUser(progressModel, usersModel, userCountsModel, user) {
 
   var daysWithAllTargetsCountingLastDay; 
   var monthlyAchievementCountingLastDay; 
   var xpCountingLastDay; 
 
-  if (null != user.daysWithAllTargetsMet) {
-    daysWithAllTargetsCountingLastDay = user.daysWithAllTargetsMet.countingLastDay || new Date("1970-01-01");
+  const userCounter = await userCountsModel.findOne(
+    {
+        'userId':user.id
+    }
+  ).exec();
+
+  if (null != userCounter && null != userCounter.daysWithAllTargetsMet) {
+    daysWithAllTargetsCountingLastDay = userCounter.daysWithAllTargetsMet.countingLastDay || new Date("1970-01-01");
   } else {
     daysWithAllTargetsCountingLastDay = new Date("1970-01-01");
   }
@@ -195,8 +202,8 @@ async function processUser(progressModel, usersModel, user) {
 //     monthlyAchievementCountingLastDay = new Date("1970-01-01");
 //   }
 
-  if (null != user.xpCounting) {
-    xpCountingLastDay = user.xpCounting.countingLastDay || new Date("1970-01-01");
+  if (null != userCounter && null != userCounter.xpCounting) {
+    xpCountingLastDay = userCounter.xpCounting.countingLastDay || new Date("1970-01-01");
   } else {
     xpCountingLastDay = new Date("1970-01-01");
   }
@@ -222,8 +229,8 @@ async function processUser(progressModel, usersModel, user) {
 
   // Update user's lastProcessedDate
 if (null!=daysWithAllTargetsMet && daysWithAllTargetsMet > 0 && null!= lastProcessedDateFullDays){
-        await usersModel.updateOne(
-            { _id: user._id }, // Match by userId
+        await userCountsModel.updateOne(
+            { userId: user.id  }, // Match by userId
             { 
             $set: { "daysWithAllTargetsMet.countingLastDay": lastProcessedDateFullDays}, // Always update the last processed date
             $inc: { "daysWithAllTargetsMet.count": daysWithAllTargetsMet
@@ -237,8 +244,8 @@ if (null!=daysWithAllTargetsMet && daysWithAllTargetsMet > 0 && null!= lastProce
 }
 if (null!= xpResultsObject && null!=xpResultsObject.numberOfTargetsMet && xpResultsObject.numberOfTargetsMet > 0 && null != xpResultsObject.newCountingLastDay){
 
-  await usersModel.updateOne(
-    { _id: user._id }, // Match by userId
+  await userCountsModel.updateOne(
+    { userId: user.id  }, // Match by userId
     { 
       $set: { 
        "xpCounting.countingLastDay": xpResultsObject.newCountingLastDay}, // Always update the last processed date
@@ -266,7 +273,7 @@ async function processUsersInBatches(mongoose) {
   try {
     const usersModel = mongoose.model('users')
     const progressModel = mongoose.model('progress')
-    
+    const userCountsModel = mongoose.model('usercounts')
     let hasMoreUsers = true;
     let lastUserId = null;
 
@@ -279,7 +286,7 @@ async function processUsersInBatches(mongoose) {
       }
 
       for (const user of users) {
-        await processUser(progressModel, usersModel, user);
+        await processUser(progressModel, usersModel, userCountsModel, user);
       }
 
       // Update lastUserId for pagination
