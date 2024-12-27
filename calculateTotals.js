@@ -12,11 +12,15 @@ const BATCH_SIZE = 1000;
 
 async function fetchUserBatch(usersModel, lastUserId) {
   const query = lastUserId ? { _id: { $gt: lastUserId } } : {};
-  return usersModel
-    .find(query)
-    .sort({ _id: 1 })
-    .limit(BATCH_SIZE)
-    .exec();
+
+ // try{
+    const result = await usersModel.find(query).sort({ _id: 1 }).limit(BATCH_SIZE).exec();
+    return result;
+  // } catch (e){
+  //   console.error(e);
+  //   return [];
+  // }
+  
 }
 
 /**
@@ -77,12 +81,12 @@ async function calculateNumberOfXPAndLastDate(
     countingLastDay
   ) {
     const today = new Date();
-    /*const yesterday = new Date(today);
+    const yesterday = new Date(today);
     yesterday.setDate(today.getDate() - 1); // Subtract one day from today to get yesterday
 
 
     // Subtract one day from today
-    today.setDate(today.getDate() - 1);*/
+    today.setDate(today.getDate() - 1);
 
     const result = await progressModel
       .aggregate([
@@ -192,13 +196,14 @@ async function processUser(progressModel, usersModel, userCountsModel, user) {
         'userId':user.id
     }
   ).exec();
-
+  
   if (null != userCounter && null != userCounter.daysWithAllTargetsMet) {
     daysWithAllTargetsCountingLastDay = userCounter.daysWithAllTargetsMet.countingLastDay || new Date("1970-01-01");
   } else {
     daysWithAllTargetsCountingLastDay = new Date("1970-01-01");
   }
-
+    
+  console.log(`Full days last counting day: ${daysWithAllTargetsCountingLastDay}`);
 //   if (null != user.monthlyAchievementPerHabit) {
 //     monthlyAchievementCountingLastDay = user.monthlyAchievementPerHabit.countingLastDay || new Date("1970-01-01");
 //   } else {
@@ -210,6 +215,7 @@ async function processUser(progressModel, usersModel, userCountsModel, user) {
   } else {
     xpCountingLastDay = new Date("1970-01-01");
   }
+  console.log(`XP last counting day: ${xpCountingLastDay}`);
   // Calculate days with all targets met and the last processed date
   const { daysWithAllTargetsMet, lastProcessedDateFullDays } =
     await calculateDaysWithAllTargetsMetAndLastDate(
@@ -217,7 +223,6 @@ async function processUser(progressModel, usersModel, userCountsModel, user) {
         user.id,
         daysWithAllTargetsCountingLastDay
     );
-
     const xpResultsObject = 
     await calculateNumberOfXPAndLastDate(
         progressModel,
@@ -228,7 +233,6 @@ async function processUser(progressModel, usersModel, userCountsModel, user) {
 //     progressModel,
 //     user.id,
 //     monthlyAchievementCountingLastDay)
-
 
   // Update user's lastProcessedDate
 if (null!=daysWithAllTargetsMet && daysWithAllTargetsMet > 0 && null!= lastProcessedDateFullDays){
@@ -280,9 +284,17 @@ async function processUsersInBatches(mongoose) {
     let hasMoreUsers = true;
     let lastUserId = null;
 
+    try{
+      const progressArray = await progressModel.find({}).exec();
+    } catch(e){
+      console.error(e)
+    }
+    const userArray = await usersModel.find({}).exec();
+    const userCountsArray = await userCountsModel.find({}).exec();
+
     while (hasMoreUsers) {
       const users = await fetchUserBatch(usersModel, lastUserId);
-
+      console.log(`Number of users found: ${users.length}`);
       if (users.length === 0) {
         hasMoreUsers = false;
         break;
@@ -299,9 +311,9 @@ async function processUsersInBatches(mongoose) {
     console.log("Batch processing completed.");
   } catch (error) {
     console.error("Error during batch processing:", error);
-  } finally {
+  } /*finally {
     await client.close();
-  }
+  }*/
 }
 
 const configuration = configManager.getApplicationConfiguration();
@@ -310,17 +322,16 @@ var lm = new logManager(configuration.logDirectory);
 lm.logger.info("Environment:"+process.env.NODE_ENV)
 
 mongoose.connect(configuration.database,{ useNewUrlParser: true, useUnifiedTopology: true, family: 4 })
-.then(()=> {
+.then(async()=> {
         console.log('Mongodb connected')
         lm.logger.info("Mongodb connected")
-        processUsersInBatches(mongoose);
+        await processUsersInBatches(mongoose);
+        console.log('Process ended');
+        process.exit(0); 
     }
     )
-    .then(()=>{
-        console.log('process ended')
-        process.exit(1);
-    })
 .catch(err => console.log(err));
+
 
 
 // Run the batch processing function
