@@ -31,12 +31,15 @@ async function calculateDaysWithAllTargetsMetAndLastDate(
   userId,
   countingLastDay
 ) {
+
+  const todaysDate = new Date();
+
   const result = await progressModel
     .aggregate([
       {
         $match: {
           userId: userId,
-          progressDateISO: { $gt: countingLastDay },
+          progressDateISO: { $gt: countingLastDay, $lt: todaysDate },
         },
       },
       {
@@ -74,19 +77,19 @@ async function calculateNumberOfXPAndLastDate(
     countingLastDay
   ) {
     const today = new Date();
-    const yesterday = new Date(today);
+    /*const yesterday = new Date(today);
     yesterday.setDate(today.getDate() - 1); // Subtract one day from today to get yesterday
 
 
     // Subtract one day from today
-    today.setDate(today.getDate() - 1);
+    today.setDate(today.getDate() - 1);*/
 
     const result = await progressModel
       .aggregate([
         {
           $match: {
             userId: userId,
-            progressDateISO: { $gt: countingLastDay,$lt: yesterday },
+            progressDateISO: { $gt: countingLastDay,$lt: today },
           },
         },
         {
