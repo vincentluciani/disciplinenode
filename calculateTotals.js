@@ -327,6 +327,7 @@ mongoose.connect(configuration.database,{ useNewUrlParser: true, useUnifiedTopol
         lm.logger.info("Mongodb connected")
         await processUsersInBatches(mongoose);
         console.log('Process ended');
+        await mongoose.connection.close();
         process.exit(0); 
     }
     )
