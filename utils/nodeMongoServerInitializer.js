@@ -9,6 +9,7 @@ const mongoStoreFactory = require('connect-mongo');
 const postReceiver = require('../utils/postReceiver.js')
 const authenticationManager = require('../utils/authenticationManager.js')
 const authRouter= require('./auth');
+const subscriptionRouter = require('./subscriptions/router.js');
 const versionRouter = require('./version')
 const cors = require('cors');
 
@@ -103,7 +104,7 @@ const initializeServer = routers => {
     })
 
     app.use('/auth',authRouter);
-
+    app.use('/subscription',subscriptionRouter);
     app.use('/version',versionRouter);
 
     httpServer.listen(port,() => {
