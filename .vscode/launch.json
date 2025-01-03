@@ -17,11 +17,21 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "batch",
+            "name": "calculations",
             "skipFiles": [
                 "<node_internals>/**"
             ],
             "program": "${workspaceFolder}/calculateTotals.js",
+            "env": {"NODE_ENV": "development","TZ":"GMT"}
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "push",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/pushMessages.js",
             "env": {"NODE_ENV": "development","TZ":"GMT"}
         }
     ]

@@ -1,35 +1,11 @@
 const mongoose = require('mongoose');
-const logManager = require('./utils/logManager.js');
-const configManager = require('./utils/configManager.js')
-require('./utils/User');
 require('./schema/UserCount.js');
 require('./schema/Progress');
-// Batch size for processing users
-const BATCH_SIZE = 1000;
-
+const batch = require('./utils/processUserBatch')
   
 /* to run in prod: NODE_ENV=production node calculateTotals.js  */
 
-async function fetchUserBatch(usersModel, lastUserId) {
-  const query = lastUserId ? { _id: { $gt: lastUserId } } : {};
 
- // try{
-    const result = await usersModel.find(query).sort({ _id: 1 }).limit(BATCH_SIZE).exec();
-    return result;
-  // } catch (e){
-  //   console.error(e);
-  //   return [];
-  // }
-  
-}
-
-/**
- * Calculate the number of days where all habits met their targets for a user,
- * and find the latest date processed.
- * @param {Collection} habitsCollection - The MongoDB habits collection
- * @param {String} userId - The user ID
- * @param {Date} countingLastDay - The date after which to calculate results
- */
 async function calculateDaysWithAllTargetsMetAndLastDate(
   progressModel,
   userId,
@@ -185,12 +161,13 @@ async function calculateMonthlyAchievementsPerHabit(habitsCollection, userId, la
  * @param {Collection} usersCollection - The MongoDB users collection
  * @param {Object} user - The user document
  */
-async function processUser(progressModel, usersModel, userCountsModel, user) {
+async function processUser(user,configuration,logger) {
 
   var daysWithAllTargetsCountingLastDay; 
   var monthlyAchievementCountingLastDay; 
   var xpCountingLastDay; 
 
+  var userCountsModel = mongoose.model('usercounts')
   const userCounter = await userCountsModel.findOne(
     {
         'userId':user.id
@@ -216,6 +193,8 @@ async function processUser(progressModel, usersModel, userCountsModel, user) {
     xpCountingLastDay = new Date("1970-01-01");
   }
   console.log(`XP last counting day: ${xpCountingLastDay}`);
+
+  var progressModel = mongoose.model('progress')
   // Calculate days with all targets met and the last processed date
   const { daysWithAllTargetsMet, lastProcessedDateFullDays } =
     await calculateDaysWithAllTargetsMetAndLastDate(
@@ -272,71 +251,13 @@ if (null!= xpResultsObject && null!=xpResultsObject.numberOfTargetsMet && xpResu
   
 }
 
-/**
- * Process users in batches
- */
-async function processUsersInBatches(mongoose) {
-  /*const { client, db } = await connectToDatabase();*/
-  try {
-    const usersModel = mongoose.model('users')
-    const progressModel = mongoose.model('progress')
-    const userCountsModel = mongoose.model('usercounts')
-    let hasMoreUsers = true;
-    let lastUserId = null;
 
-    try{
-      const progressArray = await progressModel.find({}).exec();
-    } catch(e){
-      console.error(e)
-    }
-    const userArray = await usersModel.find({}).exec();
-    const userCountsArray = await userCountsModel.find({}).exec();
-
-    while (hasMoreUsers) {
-      const users = await fetchUserBatch(usersModel, lastUserId);
-      console.log(`Number of users found: ${users.length}`);
-      if (users.length === 0) {
-        hasMoreUsers = false;
-        break;
-      }
-
-      for (const user of users) {
-        await processUser(progressModel, usersModel, userCountsModel, user);
-      }
-
-      // Update lastUserId for pagination
-      lastUserId = users[users.length - 1]._id;
-    }
-
-    console.log("Batch processing completed.");
-  } catch (error) {
-    console.error("Error during batch processing:", error);
-  } /*finally {
-    await client.close();
-  }*/
-}
-
-const configuration = configManager.getApplicationConfiguration();
-
-var lm = new logManager(configuration.logDirectory);
-lm.logger.info("Environment:"+process.env.NODE_ENV)
-
-mongoose.connect(configuration.database,{ useNewUrlParser: true, useUnifiedTopology: true, family: 4 })
-.then(async()=> {
-        console.log('Mongodb connected')
-        lm.logger.info("Mongodb connected")
-        await processUsersInBatches(mongoose);
-        console.log('Process ended');
-        await mongoose.connection.close();
-        process.exit(0); 
-    }
-    )
-.catch(err => {
-  console.log(err)
-  process.exit(1);
-}
-);
-
-
-
+try{
+   
+  batch.processBatches(mongoose,processUser);
+  
+} 
+catch (error) {
+  console.error("Error during batch processing:", error);
+} 
 // Run the batch processing function
