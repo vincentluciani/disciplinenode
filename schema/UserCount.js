@@ -21,6 +21,10 @@ const UserCountSchema = new Schema({
       type:   Date,
       required: false
     },
+    isYesterdayFull:{
+      type: Boolean,
+      required: false
+    },
     count: {
       type:   Number,
       required: false

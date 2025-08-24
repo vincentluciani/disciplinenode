@@ -3,10 +3,12 @@ require('./schema/UserCount.js');
 require('./schema/Progress');
 const batch = require('./utils/processUserBatch')
   
-/* to run in prod: NODE_ENV=production node calculateTotals.js  */
+/* to run in prod: NODE_ENV=production node calculateTotals.js 
+to run in dev: from visual studio code, change the run configuration to calculations
+ */
 
 
-async function calculateDaysWithAllTargetsMetAndLastDate(
+async function calculateDaysWithAllTargetsMetAfterDate(
   progressModel,
   userId,
   countingLastDay
@@ -49,6 +51,22 @@ async function calculateDaysWithAllTargetsMetAndLastDate(
   const lastProcessedDateFullDays = result.length > 0 ? result[result.length - 1]._id : countingLastDay;
 
   return { daysWithAllTargetsMet, lastProcessedDateFullDays };
+}
+
+async function areAllTargetsMetYesterday(  progressModel,
+  userId) {
+
+  const dayBeforeYesterday = new Date();
+  dayBeforeYesterday.setDate(dayBeforeYesterday.getDate() - 2);
+
+  const { daysWithAllTargetsMet, lastProcessedDateFullDays } =
+    await calculateDaysWithAllTargetsMetAfterDate(
+      progressModel,
+      userId,
+      dayBeforeYesterday
+    );
+
+  return daysWithAllTargetsMet === 1;
 }
 
 async function calculateNumberOfXPAndLastDate(
@@ -197,7 +215,7 @@ async function processUser(user,configuration,logger) {
   var progressModel = mongoose.model('progress')
   // Calculate days with all targets met and the last processed date
   const { daysWithAllTargetsMet, lastProcessedDateFullDays } =
-    await calculateDaysWithAllTargetsMetAndLastDate(
+    await calculateDaysWithAllTargetsMetAfterDate(
         progressModel,
         user.id,
         daysWithAllTargetsCountingLastDay
@@ -208,47 +226,54 @@ async function processUser(user,configuration,logger) {
         user.id,
         xpCountingLastDay
     );
+    const isYesterdayFull = 
+    await areAllTargetsMetYesterday(
+      progressModel,
+      user.id
+    )
 //   const monthlyResultsPerHabits = await calculateMonthlyAchievementsPerHabit(
 //     progressModel,
 //     user.id,
 //     monthlyAchievementCountingLastDay)
 
   // Update user's lastProcessedDate
-if (null!=daysWithAllTargetsMet && daysWithAllTargetsMet > 0 && null!= lastProcessedDateFullDays){
-        await userCountsModel.updateOne(
-            { userId: user.id  }, // Match by userId
-            { 
-            $set: { "daysWithAllTargetsMet.countingLastDay": lastProcessedDateFullDays}, // Always update the last processed date
-            $inc: { "daysWithAllTargetsMet.count": daysWithAllTargetsMet
-            }, // Increment count if it exists
-            },
-            { upsert: true } // Create a new document if no match is found
-        );
-        console.log(
-            `Processed User: ${user.id}, Days Met Target (increment): ${daysWithAllTargetsMet}, Last Processed Date: ${lastProcessedDateFullDays}`
+  if (null!=daysWithAllTargetsMet && daysWithAllTargetsMet > 0 && null!= lastProcessedDateFullDays){
+          await userCountsModel.updateOne(
+              { userId: user.id  }, // Match by userId
+              { 
+              $set: { "daysWithAllTargetsMet.countingLastDay": lastProcessedDateFullDays,
+                "xpCounting.isYesterdayFull": isYesterdayFull,
+              }, // Always update the last processed date
+              $inc: { "daysWithAllTargetsMet.count": daysWithAllTargetsMet
+              }, // Increment count if it exists
+              },
+              { upsert: true } // Create a new document if no match is found
           );
-}
-if (null!= xpResultsObject && null!=xpResultsObject.numberOfTargetsMet && xpResultsObject.numberOfTargetsMet > 0 && null != xpResultsObject.newCountingLastDay){
+          console.log(
+              `Processed User: ${user.id}, Days Met Target (increment): ${daysWithAllTargetsMet}, Last Processed Date: ${lastProcessedDateFullDays}`
+            );
+  }
+  if (null!= xpResultsObject && null!=xpResultsObject.numberOfTargetsMet && xpResultsObject.numberOfTargetsMet > 0 && null != xpResultsObject.newCountingLastDay){
 
-  await userCountsModel.updateOne(
-    { userId: user.id  }, // Match by userId
-    { 
-      $set: { 
-       "xpCounting.countingLastDay": xpResultsObject.newCountingLastDay}, // Always update the last processed date
-      $inc: { 
-        "xpCounting.count": xpResultsObject.numberOfTargetsMet,
-        "xpCounting.outOf": xpResultsObject.totalTargets
-       }, // Increment count if it exists
-    },
-    { upsert: true } // Create a new document if no match is found
-  );
-  console.log(
-    `Processed User: ${user.id}, Number of XP (increment): ${xpResultsObject.numberOfTargetsMet} out of ${xpResultsObject.totalTargets} , Last Processed Date: ${xpResultsObject.newCountingLastDay}`
-  );
-}
+    await userCountsModel.updateOne(
+      { userId: user.id  }, // Match by userId
+      { 
+        $set: { 
+        "xpCounting.countingLastDay": xpResultsObject.newCountingLastDay,
+        "xpCounting.isYesterdayFull": isYesterdayFull, // Always update the last processed date
+        },
+        $inc: { 
+          "xpCounting.count": xpResultsObject.numberOfTargetsMet,
+          "xpCounting.outOf": xpResultsObject.totalTargets
+        }, // Increment count if it exists
+      },
+      { upsert: true } // Create a new document if no match is found
+    );
+    console.log(
+      `Processed User: ${user.id}, Number of XP (increment): ${xpResultsObject.numberOfTargetsMet} out of ${xpResultsObject.totalTargets} , Last Processed Date: ${xpResultsObject.newCountingLastDay}`
+    );
+  }
 
-  
-  
 }
 
 
