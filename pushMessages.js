@@ -23,7 +23,7 @@ const processUser = async (user,configuration,logger) => {
         configuration.subscriptions.publicKey,
         configuration.subscriptions.privateKey)
 
-    /* SHOULD FIND MORE THAN ONE */
+    /* TODO: SHOULD INSERT MORE THAN ONE per user*/
     var userSubscriptionsModel = mongoose.model('subscriptions')
     const userSubscriptions = await userSubscriptionsModel.find(
     {

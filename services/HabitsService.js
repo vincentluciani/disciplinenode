@@ -125,7 +125,8 @@ const getUserCounts = async (queryObject,logger) => {
   if (null != userCountObjectArray && userCountObjectArray.length > 0){
     return {
       daysWithAllTargetsMet: userCountObjectArray[0].daysWithAllTargetsMet.count,
-      xpCounting: userCountObjectArray[0].xpCounting.count
+      xpCounting: userCountObjectArray[0].xpCounting.count,
+      isYesterdayFull: userCountObjectArray[0].xpCounting.isYesterdayFull
     }
   } else {
     return {}
