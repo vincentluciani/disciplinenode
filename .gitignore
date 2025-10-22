@@ -5,3 +5,5 @@ node_modules/@eslint
 node_modules/@eslint-community
 node_modules/eslint
 node_modules/esutils
+node_modules/*
+node_modules
